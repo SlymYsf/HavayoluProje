@@ -12,4 +12,19 @@ class Route extends Model
         'route_type',
         'base_price',
     ];
+
+    public function originAirport()
+    {
+        return $this->belongsTo(Airport::class, 'origin_airport_id');
+    }
+
+    public function destinationAirport()
+    {
+        return $this->belongsTo(Airport::class, 'destination_airport_id');
+    }
+
+    public function flights()
+    {
+        return $this->hasMany(Flight::class);
+    }
 }

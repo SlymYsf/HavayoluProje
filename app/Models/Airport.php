@@ -13,4 +13,14 @@ class Airport extends Model
         'is_domestic',
         'is_hub',
     ];
+
+    public function originRoutes()
+    {
+        return $this->hasMany(Route::class, 'origin_airport_id');
+    }
+
+    public function destinationRoutes()
+    {
+        return $this->hasMany(Route::class, 'destination_airport_id');
+    }
 }

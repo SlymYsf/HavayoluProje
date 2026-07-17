@@ -17,4 +17,10 @@ class Aircraft extends Model
         'premium_economy_seats',
         'economy_seats',
     ];
+
+    public function flights()
+    {
+        return $this->hasMany(Flight::class);
+    }
+
 }
