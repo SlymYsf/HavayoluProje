@@ -14,6 +14,7 @@ class Ticket extends Model
         'seat_number',
         'final_price',
         'status',
+        'checked_in_at',
     ];
 
     public function flight()
