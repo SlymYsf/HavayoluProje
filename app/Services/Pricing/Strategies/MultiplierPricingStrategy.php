@@ -7,7 +7,6 @@ use App\Services\Pricing\Contracts\PricingStrategyInterface;
 
 class MultiplierPricingStrategy implements PricingStrategyInterface
 {
-    /** Fallback strateji — her zaman uygulanabilir. */
     public function isApplicable(Flight $flight, string $cabinClass): bool
     {
         return true;
@@ -20,7 +19,8 @@ class MultiplierPricingStrategy implements PricingStrategyInterface
         $price = $basePrice
             * $this->getCabinMultiplier($cabinClass)
             * $this->getDayMultiplier($flight)
-            * $this->getOccupancyMultiplier($flight);
+            * $this->getOccupancyMultiplier($flight)
+            * $this->getAdvancePurchaseMultiplier($flight);
 
         return (int) round($price);
     }
@@ -37,7 +37,6 @@ class MultiplierPricingStrategy implements PricingStrategyInterface
 
     private function getDayMultiplier(Flight $flight): float
     {
-        // Carbon dayOfWeekIso: 1=Pzt ... 5=Cum, 6=Cmt, 7=Paz
         $isWeekend = in_array($flight->departure_time->dayOfWeekIso, [5, 6, 7]);
 
         return $isWeekend ? 1.25 : 1.0;
@@ -53,6 +52,19 @@ class MultiplierPricingStrategy implements PricingStrategyInterface
             $rate <= 0.60 => 1.2,
             $rate <= 0.85 => 1.5,
             default       => 2.0,
+        };
+    }
+
+    private function getAdvancePurchaseMultiplier(Flight $flight): float
+    {
+        $daysUntilDeparture = now()->diffInDays($flight->departure_time, false);
+
+        return match (true) {
+            $daysUntilDeparture >= 60 => 0.80,
+            $daysUntilDeparture >= 30 => 0.90,
+            $daysUntilDeparture >= 15 => 1.00,
+            $daysUntilDeparture >= 7  => 1.10,
+            default                   => 1.20,
         };
     }
 }

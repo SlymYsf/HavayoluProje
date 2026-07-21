@@ -11,6 +11,7 @@ class Route extends Model
         'destination_airport_id',
         'route_type',
         'base_price',
+        'daily_frequency',
     ];
 
     public function originAirport()

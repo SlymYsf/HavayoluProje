@@ -17,6 +17,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(\App\Services\Pricing\PricingStrategyFactory::class);
         $this->app->singleton(\App\Services\Pricing\PricingService::class);
         $this->app->singleton(\App\Services\FlightSearchService::class);
+        $this->app->singleton(\App\Services\TicketService::class);
+        $this->app->singleton(\App\Services\CompensationService::class);
+        $this->app->singleton(\App\Services\FlightScheduleService::class);
     }
 
     /**

@@ -54,7 +54,7 @@ class FlightService
      * Uçağın o saatte müsait olup olmadığını KONTROL ETMEZ — bu proje kapsamı dışında
      * bırakıldı (bkz. PROJECT_CONTEXT.md, "Gün 7 İçin Ayrı Bir Karar").
      */
-    public function createFlight(Route $route, \DateTimeInterface $departureTime, \DateTimeInterface $arrivalTime): Flight
+    public function createFlight(Route $route, \DateTimeInterface $departureTime, \DateTimeInterface $arrivalTime, ?string $flightNumber = null): Flight
     {
         $aircraft = $this->pickRandomEligibleAircraft($route);
 
@@ -63,7 +63,7 @@ class FlightService
         }
 
         return Flight::create([
-            'flight_number'  => $this->generateFlightNumber(),
+            'flight_number'  => $flightNumber ?? $this->generateFlightNumber(),
             'route_id'       => $route->id,
             'aircraft_id'    => $aircraft->id,
             'departure_time' => $departureTime,
@@ -105,9 +105,17 @@ class FlightService
     private function generateFlightNumber(): string
     {
         do {
-            $number = 'DH' . random_int(100, 9999);
+            $number = 'DH' . random_int(100, 999999);
         } while (Flight::where('flight_number', $number)->exists());
 
         return $number;
     }
+
+    public function findByNumberAndDate(string $flightNumber, string $date): ?Flight
+    {
+        return Flight::where('flight_number', $flightNumber)
+            ->whereDate('departure_time', $date)
+            ->first();
+    }
+
 }

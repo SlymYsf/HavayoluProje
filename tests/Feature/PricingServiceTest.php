@@ -7,6 +7,7 @@ use App\Models\Route;
 use App\Services\FlightSearchService;
 use App\Services\FlightService;
 use App\Services\Pricing\PricingService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -18,6 +19,13 @@ class PricingServiceTest extends TestCase
     {
         parent::setUp();
         $this->seed();
+        Carbon::setTestNow('2026-06-01 00:00:00');
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
     }
 
     public function test_multiplier_strategy_applies_correct_multipliers(): void
@@ -25,11 +33,9 @@ class PricingServiceTest extends TestCase
         $flightService = new FlightService();
         $route = Route::whereHas('destinationAirport', fn ($q) => $q->where('iata_code', 'LHR'))->first();
 
-        $flight = $flightService->createFlight(
-            $route,
-            \Carbon\Carbon::parse('2026-07-24 10:00'), // Cuma
-            \Carbon\Carbon::parse('2026-07-24 14:00')
-        );
+        // 20 gün sonraki ilk Cuma: hafta sonu (1.25x) + nötr erken-rezervasyon bandı (15-29 gün, 1.0x)
+        $departure = Carbon::now()->addDays(20)->next(Carbon::FRIDAY)->setTime(10, 0);
+        $flight = $flightService->createFlight($route, $departure, $departure->copy()->addHours(4));
 
         $pricingService = app(PricingService::class);
 
@@ -41,7 +47,10 @@ class PricingServiceTest extends TestCase
     {
         $flightService = new FlightService();
         $route = Route::whereHas('destinationAirport', fn ($q) => $q->where('iata_code', 'ESB'))->first();
-        $flight = $flightService->createFlight($route, now()->addDays(3), now()->addDays(3)->addHour());
+
+        // Hafta içi + nötr erken-rezervasyon bandı (15-29 gün) → taban fiyata birebir eşit olmalı
+        $departure = Carbon::now()->addDays(20)->next(Carbon::MONDAY)->setTime(10, 0);
+        $flight = $flightService->createFlight($route, $departure, $departure->copy()->addHour());
 
         $pricingService = app(PricingService::class);
 
@@ -59,17 +68,18 @@ class PricingServiceTest extends TestCase
             $d = -0.1 * $p + 0.5 * $q + 150;
 
             DemandObservation::create([
-                'route_id'            => $route->id,
-                'cabin_class'         => 'economy',
-                'observation_date'    => now()->subDays(30 - $i),
-                'is_weekend'          => false,
-                'price'               => $p,
-                'capacity_remaining'  => $q,
-                'seats_sold'          => $d,
+                'route_id'           => $route->id,
+                'cabin_class'        => 'economy',
+                'observation_date'   => Carbon::now()->subDays(30 - $i),
+                'is_weekend'         => false,
+                'price'              => $p,
+                'capacity_remaining' => $q,
+                'seats_sold'         => $d,
             ]);
         }
 
-        $flight = $flightService->createFlight($route, now()->addDays(3), now()->addDays(3)->addHour());
+        $departure = Carbon::now()->addDays(20)->next(Carbon::MONDAY)->setTime(10, 0);
+        $flight = $flightService->createFlight($route, $departure, $departure->copy()->addHour());
         $pricingService = app(PricingService::class);
 
         $price = $pricingService->calculatePrice($flight, 'economy');
@@ -82,12 +92,31 @@ class PricingServiceTest extends TestCase
         $flightService = new FlightService();
         $adanaRoute = Route::whereHas('destinationAirport', fn ($q) => $q->where('iata_code', 'ADA'))->first();
 
-        $flight = $flightService->createFlight($adanaRoute, now()->addDays(2), now()->addDays(2)->addHour());
+        $departure = Carbon::now()->addDays(20)->next(Carbon::MONDAY)->setTime(10, 0);
+        $flight = $flightService->createFlight($adanaRoute, $departure, $departure->copy()->addHour());
 
         $searchService = app(FlightSearchService::class);
         $fares = $searchService->getPricedFares($flight);
 
         $this->assertArrayHasKey('economy', $fares);
         $this->assertArrayNotHasKey('business', $fares);
+    }
+
+    public function test_advance_purchase_discount_makes_early_booking_cheaper(): void
+    {
+        $flightService = new FlightService();
+        $route = Route::whereHas('destinationAirport', fn ($q) => $q->where('iata_code', 'ESB'))->first();
+        $pricingService = app(PricingService::class);
+
+        $farDeparture = Carbon::now()->addDays(75)->next(Carbon::TUESDAY)->setTime(10, 0);
+        $farFlight = $flightService->createFlight($route, $farDeparture, $farDeparture->copy()->addHour());
+
+        $nearDeparture = Carbon::now()->addDays(2)->next(Carbon::TUESDAY)->setTime(10, 0);
+        $nearFlight = $flightService->createFlight($route, $nearDeparture, $nearDeparture->copy()->addHour());
+
+        $farPrice = $pricingService->calculatePrice($farFlight, 'economy');
+        $nearPrice = $pricingService->calculatePrice($nearFlight, 'economy');
+
+        $this->assertLessThan($nearPrice, $farPrice);
     }
 }
