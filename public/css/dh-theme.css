@@ -1,0 +1,864 @@
+:root {
+    --dh-red: #C8102E;
+    --dh-red-dark: #8C0A20;
+    --dh-red-tint: #FCE9EC;
+    --dh-red-tint-strong: #F09595;
+    --dh-ink: #1C1A1B;
+    --dh-cloud: #F4F4F6;
+    --dh-dark: #161414;
+    --dh-border: #E2E1DC;
+    --dh-muted: #5F5E5A;
+    --dh-placeholder: #B4B2A9;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: var(--dh-ink);
+    line-height: 1.5;
+    background: #FFFFFF;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* ===== HEADER ===== */
+
+.dh-header {
+    background: linear-gradient(135deg, #0A0809 0%, #1C0E11 35%, #3D1219 65%, #5C1A22 100%);
+}
+
+.dh-header-utility {
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+    padding: 10px 24px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.dh-header-main {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 14px 24px 28px;
+}
+
+.dh-main-nav {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 20px;
+}
+
+.dh-main-nav a {
+    font-size: 13px;
+    font-weight: 500;
+    color: #FFFFFF;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    padding: 0 10px;
+}
+
+.dh-main-nav a:hover {
+    color: var(--dh-red-tint-strong);
+}
+
+.dh-nav-sep {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 12px;
+}
+
+.dh-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dh-logo img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    background: #FFFFFF;
+    border-radius: 50%;
+    padding: 6px;
+    box-sizing: border-box;
+}
+
+.dh-logo span {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: #FFFFFF;
+}
+
+.dh-login-btn {
+    background: none;
+    border: 0.5px solid rgba(255, 255, 255, 0.4);
+    color: #FFFFFF;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+}
+
+/* ===== SEKMELER ===== */
+
+.dh-tabs {
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    gap: 6px;
+}
+
+.dh-tab {
+    background: var(--dh-cloud);
+    border: 0.5px solid var(--dh-border);
+    border-radius: 10px 10px 0 0;
+    padding: 12px 18px;
+    font-size: 13px;
+    color: var(--dh-muted);
+    font-family: 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dh-tab-active {
+    background: #FFFFFF;
+    color: var(--dh-red-dark);
+    font-weight: 500;
+    border-bottom-color: #FFFFFF;
+}
+
+/* ===== ANA İÇERİK ===== */
+
+main {
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),
+        url('/images/hero-plane.jpg');
+    background-size: cover;
+    background-position: center 65%;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    padding-top: 90px;
+    padding-bottom: 40px;
+}
+
+/* ===== PANELLER / FORMLAR ===== */
+
+.dh-panel {
+    width: 100%;
+    padding: 0 0 24px;
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.dh-search-card {
+    background: #FFFFFF;
+    border-radius: 0 0 12px 12px;
+    padding: 20px 24px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.dh-trip-type {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 0.5px solid var(--dh-border);
+}
+
+.dh-radio {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.dh-radio input {
+    accent-color: var(--dh-red);
+}
+
+.dh-radio-disabled {
+    color: var(--dh-placeholder);
+    cursor: not-allowed;
+}
+
+.dh-radio-disabled em {
+    font-style: normal;
+    font-size: 11px;
+}
+
+.dh-search-form-v2 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: stretch;
+}
+
+.dh-route-half {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 16px;
+    background: var(--dh-cloud);
+    border-radius: 8px;
+    height: 52px;
+    box-sizing: border-box;
+}
+
+
+.dh-route-field {
+    flex: 2 1 320px;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 24px;
+    position: relative;
+}
+
+
+.dh-route-half label {
+    display: block;
+    font-size: 11px;
+    line-height: 1.2;
+    color: var(--dh-muted);
+    margin-bottom: 2px;
+}
+
+.dh-route-half select {
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 17px;
+    line-height: 1.2;
+    font-weight: 500;
+    font-family: 'Space Grotesk', sans-serif;
+    width: 100%;
+    color: var(--dh-ink);
+}
+
+.dh-swap-btn {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 0.5px solid var(--dh-border);
+    color: var(--dh-red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 15px;
+    z-index: 1;
+    margin: 0;
+    padding: 0;
+}
+
+.dh-date-field {
+    flex: 1 1 130px;
+    background: var(--dh-cloud);
+    border-radius: 8px;
+    padding: 8px 16px;
+    height: 52px;
+    box-sizing: border-box;
+}
+
+.dh-date-field label {
+    display: block;
+    font-size: 11px;
+    line-height: 1.2;
+    color: var(--dh-muted);
+    margin-bottom: 2px;
+}
+
+.dh-date-field input {
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 15px;
+    line-height: 1.3;
+    font-weight: 500;
+    font-family: 'IBM Plex Sans', sans-serif;
+    width: 100%;
+    color: var(--dh-ink);
+}
+
+.dh-passenger-field {
+    flex: 1 1 110px;
+    background: var(--dh-cloud);
+    border-radius: 8px;
+    padding: 8px 16px;
+    height: 52px;
+    box-sizing: border-box;
+}
+
+.dh-passenger-field label {
+    display: block;
+    font-size: 11px;
+    line-height: 1.2;
+    color: var(--dh-muted);
+    margin-bottom: 2px;
+}
+
+.dh-passenger-value {
+    font-size: 15px;
+    line-height: 1.3;
+    font-weight: 500;
+}
+
+.dh-search-submit {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dh-simple-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 10px;
+    align-items: end;
+}
+
+.dh-form-hints {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 4px;
+}
+
+.dh-form-hints a {
+    font-size: 12px;
+    color: var(--dh-red);
+}
+
+.dh-form-hints a:hover {
+    text-decoration: underline;
+}
+
+.dh-field {
+    background: var(--dh-cloud);
+    border-radius: 8px;
+    padding: 8px 12px;
+    height: 52px;
+    box-sizing: border-box;
+}
+
+.dh-field label {
+    display: block;
+    font-size: 11px;
+    line-height: 1.2;
+    color: var(--dh-muted);
+    margin-bottom: 2px;
+}
+
+.dh-field input {
+    border: none;
+    outline: none;
+    background: none;
+    font-size: 14px;
+    line-height: 1.3;
+    font-weight: 500;
+    font-family: 'IBM Plex Sans', sans-serif;
+    width: 100%;
+    color: var(--dh-ink);
+}
+
+.dh-field input::placeholder {
+    color: var(--dh-placeholder);
+    font-weight: 400;
+}
+
+.dh-btn-primary {
+    background: var(--dh-red);
+    color: var(--dh-red-tint);
+    border: none;
+    border-radius: 8px;
+    padding: 0 20px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+    height: 52px;
+}
+
+.dh-btn-primary:hover {
+    background: var(--dh-red-dark);
+}
+
+/* ===== ÜCRET TAKVİMİ ===== */
+
+.dh-fare-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin: 22px 0;
+    padding: 0 24px;
+}
+
+.dh-calendar-day {
+    border: 0.5px solid var(--dh-border);
+    border-radius: 8px;
+    padding: 8px 4px;
+    text-align: center;
+    cursor: pointer;
+    background: #FFFFFF;
+}
+
+.dh-calendar-day:hover {
+    border-color: var(--dh-red);
+}
+
+.dh-calendar-day-num {
+    font-size: 12px;
+    color: var(--dh-muted);
+}
+
+.dh-calendar-day-price {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.dh-calendar-day-cheapest {
+    background: var(--dh-red-tint);
+    border: 1.5px solid var(--dh-red);
+}
+
+.dh-calendar-day-cheapest .dh-calendar-day-num,
+.dh-calendar-day-cheapest .dh-calendar-day-price {
+    color: var(--dh-red-dark);
+    font-weight: 500;
+}
+
+/* ===== UÇUŞ SONUÇLARI ===== */
+
+.dh-flight-card {
+    border: 0.5px solid var(--dh-border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+    background: #FFFFFF;
+}
+
+.dh-flight-results {
+    padding: 0 24px;
+}
+
+.dh-flight-time {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.dh-flight-path {
+    flex: 1;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dh-flight-path-line {
+    flex: 1;
+    border-top: 2px dashed var(--dh-red-tint-strong);
+    height: 1px;
+    position: relative;
+}
+
+.dh-flight-path-code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--dh-muted);
+}
+
+.dh-aircraft-badge {
+    background: var(--dh-cloud);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 11px;
+    color: var(--dh-muted);
+}
+
+.dh-fare-pill {
+    background: var(--dh-red-tint);
+    color: var(--dh-red-dark);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.dh-fare-pill-business {
+    background: var(--dh-red);
+    color: var(--dh-red-tint);
+}
+
+/* ===== FOOTER ===== */
+
+.dh-footer {
+    background: var(--dh-dark);
+    color: rgba(255, 255, 255, 0.75);
+    padding: 28px 24px 0;
+}
+
+.dh-footer-columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
+    max-width: 960px;
+    margin: 0 auto;
+    padding-bottom: 24px;
+}
+
+.dh-footer h3 {
+    color: var(--dh-red-tint-strong);
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.dh-footer ul {
+    list-style: none;
+}
+
+.dh-footer li {
+    line-height: 2.1;
+    font-size: 12px;
+}
+
+.dh-footer-bottom {
+    max-width: 960px;
+    margin: 0 auto;
+    border-top: 0.5px solid rgba(255, 255, 255, 0.15);
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.dh-footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dh-footer-brand img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    background: #FFFFFF;
+    border-radius: 50%;
+    padding: 4px;
+    box-sizing: border-box;
+}
+
+.dh-footer-brand span {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+}
+
+.dh-footer-social {
+    display: flex;
+    gap: 16px;
+    font-size: 16px;
+}
+
+.dh-footer-legal {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    padding: 12px 0;
+    border-top: 0.5px solid rgba(255, 255, 255, 0.15);
+}
+
+.dh-footer-copyright {
+    max-width: 960px;
+    margin: 0 auto;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 12px 0 20px;
+}
+
+.dh-msg {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--dh-muted);
+}
+
+.dh-results-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    margin: 16px 0 10px;
+    color: var(--dh-ink);
+}
+
+.dh-flight-number {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--dh-muted);
+}
+
+.dh-plane-icon {
+    position: absolute;
+    top: -9px;
+    left: 40%;
+    font-size: 16px;
+    color: var(--dh-red);
+}
+/* ===== NEREYE — ARAMA VE OTOMATİK TAMAMLAMA ===== */
+
+.dh-route-half {
+    position: relative;
+}
+
+.dh-route-input {
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 17px;
+    line-height: 1.2;
+    font-weight: 500;
+    font-family: 'Space Grotesk', sans-serif;
+    width: 100%;
+    color: var(--dh-ink);
+}
+
+.dh-route-input::placeholder {
+    color: var(--dh-placeholder);
+    font-weight: 400;
+    font-size: 15px;
+}
+
+.dh-autocomplete {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #FFFFFF;
+    border: 0.5px solid var(--dh-border);
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    max-height: 280px;
+    overflow-y: auto;
+    z-index: 20;
+}
+
+.dh-autocomplete-item {
+    padding: 10px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    border-bottom: 0.5px solid var(--dh-border);
+}
+
+.dh-autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.dh-autocomplete-item:hover {
+    background: var(--dh-cloud);
+}
+
+.dh-autocomplete-city {
+    font-weight: 500;
+}
+
+.dh-autocomplete-meta {
+    font-size: 12px;
+    color: var(--dh-muted);
+}
+
+.dh-autocomplete-all {
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--dh-red);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dh-autocomplete-all:hover {
+    background: var(--dh-red-tint);
+}
+
+.dh-autocomplete-empty {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--dh-muted);
+}
+
+/* ===== TÜM UÇUŞ NOKTALARI MODAL ===== */
+
+.dh-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.dh-modal[hidden] {
+    display: none;
+}
+
+.dh-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.dh-modal-box {
+    position: relative;
+    background: #FFFFFF;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 760px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.dh-modal-header {
+    background: var(--dh-dark);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 16px 20px;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.dh-modal-close {
+    background: none;
+    border: none;
+    color: #FFFFFF;
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.dh-modal-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+    flex: 1;
+}
+
+.dh-modal-col {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-right: 0.5px solid var(--dh-border);
+}
+
+.dh-modal-col:last-child {
+    border-right: none;
+}
+
+.dh-modal-col-title {
+    padding: 14px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    border-bottom: 0.5px solid var(--dh-border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dh-modal-list {
+    overflow-y: auto;
+    flex: 1;
+}
+
+.dh-modal-item {
+    padding: 12px 20px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.dh-modal-item:hover {
+    background: var(--dh-cloud);
+}
+
+.dh-modal-item-active {
+    background: var(--dh-red-tint);
+    color: var(--dh-red-dark);
+    font-weight: 500;
+}
+
+.dh-modal-letter {
+    padding: 8px 20px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--dh-muted);
+    background: var(--dh-cloud);
+    position: sticky;
+    top: 0;
+}
+
+.dh-modal-hint {
+    padding: 16px 20px;
+    font-size: 13px;
+    color: var(--dh-muted);
+}
+
+.dh-route-fixed {
+    font-size: 17px;
+    line-height: 1.2;
+    font-weight: 500;
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--dh-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dh-autocomplete-icon {
+    font-size: 15px;
+    margin-right: 8px;
+    color: var(--dh-muted);
+    vertical-align: -2px;
+}
