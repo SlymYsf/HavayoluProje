@@ -11,6 +11,7 @@ class Ticket extends Model
         'flight_id',
         'passenger_id',
         'cabin_class',
+        'passenger_type',
         'seat_number',
         'final_price',
         'status',

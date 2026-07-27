@@ -22,7 +22,14 @@ class TicketManagementController extends Controller
             return response()->json(['error' => 'Rezervasyon bulunamadı.'], 404);
         }
 
-        return response()->json($ticket->load(['flight.route.originAirport', 'flight.route.destinationAirport', 'passenger']));
+        $ticket->load(['flight.route.originAirport', 'flight.route.destinationAirport', 'passenger']);
+
+        return response()->json(
+            $ticket->toArray() + [
+                'check_in_opens_at' => $this->ticketService->checkInOpensAt($ticket)->toIso8601String(),
+                'check_in_open'     => $this->ticketService->isCheckInOpen($ticket),
+            ]
+        );
     }
 
     public function cancel(Request $request)

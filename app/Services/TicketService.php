@@ -8,8 +8,13 @@ use App\Models\Ticket;
 use App\Services\Pricing\PricingService;
 use Illuminate\Support\Facades\DB;
 
+
+
 class TicketService
 {
+    /** Check-in, kalkıştan bu kadar saat önce açılır. */
+    private const CHECK_IN_WINDOW_HOURS = 24;
+
     /** Kapasitenin %10 fazlasına kadar satışa izin verilir (overbooking). */
     private const OVERBOOKING_MULTIPLIER = 1.10;
 
@@ -132,10 +137,30 @@ class TicketService
             throw new \RuntimeException('Bu uçuşun kalkış saati geçti, check-in yapılamaz.');
         }
 
+        if (now()->lt($this->checkInOpensAt($ticket))) {
+            $opensAt = $this->checkInOpensAt($ticket)->format('d.m.Y H:i');
+            throw new \RuntimeException("Check-in henüz açılmadı. Açılış zamanı: {$opensAt}");
+        }
+
         $ticket->checked_in_at = now();
         $ticket->save();
 
         return $ticket;
+    }
+
+    /** Check-in'in açılacağı an (kalkış - 24 saat). */
+    public function checkInOpensAt(Ticket $ticket): \Carbon\Carbon
+    {
+        return $ticket->flight->departure_time->copy()->subHours(self::CHECK_IN_WINDOW_HOURS);
+    }
+
+    /** Şu an check-in penceresi açık mı? */
+    public function isCheckInOpen(Ticket $ticket): bool
+    {
+        $now = now();
+
+        return $now->gte($this->checkInOpensAt($ticket))
+            && $now->lt($ticket->flight->departure_time);
     }
 
     public function cancelTicket(Ticket $ticket): Ticket
