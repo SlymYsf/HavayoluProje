@@ -20,8 +20,7 @@ class FlightSearchController extends Controller
     /** Arama formunu doldurmak için havalimanı listesi (yarın frontend bunu kullanacak). */
     public function airports()
     {
-        $airports = Airport::orderBy('city')->get(['id', 'iata_code', 'city', 'country', 'is_hub']);
-
+        $airports = Airport::orderBy('city')->get(['id', 'iata_code', 'name', 'city', 'country', 'is_hub']);
         return response()->json($airports);
     }
 
@@ -29,9 +28,13 @@ class FlightSearchController extends Controller
     public function search(Request $request)
     {
         $validated = $request->validate([
-            'origin_airport_id' => 'required|exists:airports,id',
+            'origin_airport_id'      => 'required|exists:airports,id',
             'destination_airport_id' => 'required|exists:airports,id',
-            'date' => 'nullable|date',
+            'date'                   => 'nullable|date',
+            'adult'                  => 'nullable|integer|min:0|max:9',
+            'child'                  => 'nullable|integer|min:0|max:9',
+            'infant'                 => 'nullable|integer|min:0|max:9',
+            'student'                => 'nullable|integer|min:0|max:9',
         ]);
 
         $route = Route::where('origin_airport_id', $validated['origin_airport_id'])
@@ -44,6 +47,26 @@ class FlightSearchController extends Controller
 
         $date = isset($validated['date']) ? \Carbon\Carbon::parse($validated['date']) : null;
 
-        return response()->json($this->searchService->searchFlights($route, $date));
+        $passengers = [
+            'adult'   => (int) ($validated['adult'] ?? 1),
+            'child'   => (int) ($validated['child'] ?? 0),
+            'infant'  => (int) ($validated['infant'] ?? 0),
+            'student' => (int) ($validated['student'] ?? 0),
+        ];
+
+        return response()->json($this->searchService->searchFlights($route, $date, $passengers));
+    }
+
+    /** Verilen kalkış noktasından uçuş yapılan destinasyonları döner. */
+    public function destinations(int $airportId)
+    {
+        $destinationIds = Route::where('origin_airport_id', $airportId)
+            ->pluck('destination_airport_id');
+
+        $airports = Airport::whereIn('id', $destinationIds)
+            ->orderBy('city')
+            ->get(['id', 'iata_code', 'name', 'city', 'country', 'is_hub']);
+
+        return response()->json($airports);
     }
 }

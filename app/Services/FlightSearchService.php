@@ -19,7 +19,7 @@ class FlightSearchService
      * her biri için hesaplanmış kabin sınıfı fiyatlarıyla birlikte döner.
      * Bu, Faz 5'te frontend'in üzerine kurulacağı servis katmanı temelidir.
      */
-    public function searchFlights(Route $route, ?\DateTimeInterface $date = null): Collection
+    public function searchFlights(Route $route, ?\DateTimeInterface $date = null, array $passengers = []): Collection
     {
         $query = Flight::where('route_id', $route->id)->where('status', 'Planlandı');
 
@@ -29,18 +29,48 @@ class FlightSearchService
 
         return $query->get()->map(fn (Flight $flight) => [
             'flight' => $flight,
-            'fares'  => $this->getPricedFares($flight),
+            'fares'  => $this->getPricedFares($flight, $passengers),
         ]);
     }
 
-    /** Bir uçuş için satışa açık her kabin sınıfının fiyatını döner. */
-    public function getPricedFares(Flight $flight): array
+    /**
+     * Bir uçuş için satışa açık her kabin sınıfının fiyatını döner.
+     * Yolcu dağılımı verilirse toplam fiyat ve tip bazlı kırılım da hesaplanır.
+     */
+    public function getPricedFares(Flight $flight, array $passengers = []): array
     {
         $classes = $this->flightService->getSellableCabinClasses($flight->aircraft, $flight->route);
 
+        $passengers = array_filter($passengers, fn ($count) => $count > 0);
+        if (empty($passengers)) {
+            $passengers = ['adult' => 1];
+        }
+
         $fares = [];
+
         foreach ($classes as $cabinClass) {
-            $fares[$cabinClass] = $this->pricingService->calculatePrice($flight, $cabinClass);
+            $breakdown = [];
+            $total = 0;
+
+            foreach ($passengers as $type => $count) {
+                $unit = $this->pricingService->calculatePrice($flight, $cabinClass, $type);
+                $subtotal = $unit * $count;
+                $total += $subtotal;
+
+                $breakdown[] = [
+                    'type'     => $type,
+                    'count'    => $count,
+                    'unit'     => $unit,
+                    'subtotal' => $subtotal,
+                ];
+            }
+
+            $fares[$cabinClass] = [
+                'unit_price'      => $this->pricingService->calculatePrice($flight, $cabinClass, 'adult'),
+                'total_price'     => $total,
+                'passenger_count' => array_sum($passengers),
+                'breakdown'       => $breakdown,
+            ];
         }
 
         return $fares;
