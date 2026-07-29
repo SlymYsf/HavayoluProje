@@ -15,7 +15,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->preventRequestForgery(except: [
             'api/*',
         ]);
+
+        $middleware->alias([
+            'reservation.timeout' => \App\Http\Middleware\ReservationTimeout::class,
+        ]);
+
     })
+
+
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*'),

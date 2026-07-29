@@ -16,12 +16,12 @@ class AircraftSeeder extends Seeder
             ['model' => 'B787-9',     'code' => 'D', 'body_type' => 'wide',   'total_capacity' => 300, 'business_seats' => 30, 'premium_economy_seats' => 21, 'economy_seats' => 249, 'count' => 8],
             ['model' => 'A350-900',   'code' => 'X', 'body_type' => 'wide',   'total_capacity' => 329, 'business_seats' => 32, 'premium_economy_seats' => 24, 'economy_seats' => 273, 'count' => 8],
 
-            // Dar gövde — fiziksel business var, iç hatta satılmaz (kural FlightService'te), dış hatta business+economy
-            ['model' => 'A321neo',    'code' => 'R', 'body_type' => 'narrow', 'total_capacity' => 182, 'business_seats' => 20, 'premium_economy_seats' => 0,  'economy_seats' => 162, 'count' => 15],
-            ['model' => 'A320neo',    'code' => 'S', 'body_type' => 'narrow', 'total_capacity' => 168, 'business_seats' => 16, 'premium_economy_seats' => 0,  'economy_seats' => 152, 'count' => 8],
-            ['model' => 'B737-800',   'code' => 'B', 'body_type' => 'narrow', 'total_capacity' => 151, 'business_seats' => 16, 'premium_economy_seats' => 0,  'economy_seats' => 135, 'count' => 11],
-            ['model' => 'B737 MAX 8', 'code' => 'N', 'body_type' => 'narrow', 'total_capacity' => 151, 'business_seats' => 16, 'premium_economy_seats' => 0,  'economy_seats' => 135, 'count' => 8],
-        ];
+            ['model' => 'A321neo',    'code' => 'R', 'body_type' => 'narrow', 'total_capacity' => 182, 'business_seats' => 20, 'premium_economy_seats' => 0,  'economy_seats' => 162, 'count' => 24],
+            ['model' => 'A320neo',    'code' => 'S', 'body_type' => 'narrow', 'total_capacity' => 168, 'business_seats' => 16, 'premium_economy_seats' => 0,  'economy_seats' => 152, 'count' => 14],
+            ['model' => 'B737-800',   'code' => 'B', 'body_type' => 'narrow', 'total_capacity' => 151, 'business_seats' => 16, 'premium_economy_seats' => 0,  'economy_seats' => 135, 'count' => 18],
+            ['model' => 'B737 MAX 8', 'code' => 'N', 'body_type' => 'narrow', 'total_capacity' => 151, 'business_seats' => 16, 'premium_economy_seats' => 0,  'economy_seats' => 135, 'count' => 12],
+
+            ];
 
         $total = 0;
 

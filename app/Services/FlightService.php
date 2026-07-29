@@ -19,12 +19,22 @@ class FlightService
 
     public function canAssignAircraft(Aircraft $aircraft, Route $route): bool
     {
+        // Geniş gövde + iç hat → sadece belirlenmiş hub varışlarına
         if ($aircraft->body_type === 'wide' && $route->route_type === 'domestic') {
             $otherAirport = $route->originAirport->is_hub
                 ? $route->destinationAirport
                 : $route->originAirport;
 
             return in_array($otherAirport->iata_code, self::HUB_ROUTE_CODES);
+        }
+
+        // Dar gövde → menzili uzun/ultra-uzun dış hatlara yetmez
+        // (B737-800: 5.765 km, A321neo: 6.500 km — IST-JFK bile ~8.100 km)
+        if ($aircraft->body_type === 'narrow') {
+            $category = $route->getRangeCategory();
+            if (in_array($category, ['long', 'ultra_long'], true)) {
+                return false;
+            }
         }
 
         return true;
@@ -118,4 +128,7 @@ class FlightService
             ->first();
     }
 
+
+
 }
+

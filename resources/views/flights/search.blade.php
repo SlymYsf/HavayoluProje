@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/dh-theme.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
 </head>
 <body>
@@ -52,69 +53,18 @@
     </nav>
 
     <section id="panel-ucak" class="dh-panel">
-        <div class="dh-search-card">
-            <div class="dh-trip-type">
-                <label class="dh-radio">
-                    <input type="radio" name="trip_type" value="round_trip" checked>
-                    <span>Gidiş - Dönüş</span>
-                </label>
-                <label class="dh-radio">
-                    <input type="radio" name="trip_type" value="one_way">
-                    <span>Tek yön</span>
-                </label>
-                <label class="dh-radio dh-radio-disabled">
-                    <input type="radio" name="trip_type" value="stopover" disabled>
-                    <span>İstanbul'da Stopover <em>(yakında)</em></span>
-                </label>
-                <label class="dh-radio dh-radio-disabled">
-                    <input type="radio" name="trip_type" value="multi_city" disabled>
-                    <span>Çoklu uçuş <em>(yakında)</em></span>
-                </label>
+
+        @if($errors->has('reservation'))
+            <div class="dh-form-error" style="margin-bottom:12px">
+                <i class="ti ti-alert-circle" aria-hidden="true"></i>
+                <span>{{ $errors->first('reservation') }}</span>
             </div>
+        @endif
 
-            <form id="search-form" class="dh-search-form-v2">
-                <div class="dh-route-field">
-                    <div class="dh-route-half">
-                        <label for="origin-search">Nereden</label>
-                        <input type="text" id="origin-search" class="dh-route-input" placeholder="Şehir ya da havalimanı" autocomplete="off">
-                        <input type="hidden" id="origin" name="origin_airport_id">
-                        <div id="origin-dropdown" class="dh-autocomplete" hidden></div>
-                    </div>
-                    <button type="button" id="swap-airports" class="dh-swap-btn" aria-label="Kalkış ve varış noktasını değiştir">
-                        <i class="ti ti-arrows-exchange" aria-hidden="true"></i>
-                    </button>
-                    <div class="dh-route-half">
-                        <label for="destination-search">Nereye</label>
-                        <input type="text" id="destination-search" class="dh-route-input" placeholder="Şehir ya da havalimanı" autocomplete="off">
-                        <input type="hidden" id="destination" name="destination_airport_id">
-                        <div id="destination-dropdown" class="dh-autocomplete" hidden></div>
-                    </div>
-                </div>
+        @include('partials.search-form')
 
-                <div class="dh-date-field">
-                    <label for="departure-date">Gidiş</label>
-                    <input type="text" id="departure-date" name="date" placeholder="Tarih seçin">
-                </div>
-
-                <div class="dh-date-field" id="return-date-field">
-                    <label for="return-date">Dönüş</label>
-                    <input type="text" id="return-date" name="return_date" placeholder="Tarih seçin">
-                </div>
-
-                <div class="dh-passenger-field">
-                    <label>Yolcular</label>
-                    <div class="dh-passenger-value">1 Yolcu</div>
-                </div>
-
-                <button type="submit" class="dh-btn-primary dh-search-submit">
-                    Uçuş ara <i class="ti ti-arrow-right" aria-hidden="true"></i>
-                </button>
-            </form>
-        </div>
-
-        <div id="fare-calendar" class="dh-fare-calendar"></div>
-
-        <div id="flight-results" class="dh-flight-results"></div>
+        <div id="fare-calendar" class="dh-fare-calendar" hidden></div>
+        <div id="flight-results" class="dh-flight-results" hidden></div>
     </section>
 
     <section id="panel-checkin" class="dh-panel" hidden>
@@ -177,33 +127,6 @@
         </div>
         <div id="status-result"></div>
     </section>
-    <div id="destinations-modal" class="dh-modal" hidden>
-        <div class="dh-modal-backdrop" id="modal-backdrop"></div>
-        <div class="dh-modal-box">
-            <div class="dh-modal-header">
-                <span>Aşağıdaki ülke ve şehirler arasından seçim yapabilirsiniz.</span>
-                <button type="button" id="modal-close" class="dh-modal-close" aria-label="Kapat">
-                    <i class="ti ti-x" aria-hidden="true"></i>
-                </button>
-            </div>
-            <div class="dh-modal-body">
-                <div class="dh-modal-col">
-                    <div class="dh-modal-col-title">
-                        <i class="ti ti-world" aria-hidden="true"></i>
-                        Ülke / Bölge (<span id="country-count">0</span>)
-                    </div>
-                    <div id="country-list" class="dh-modal-list"></div>
-                </div>
-                <div class="dh-modal-col">
-                    <div class="dh-modal-col-title">
-                        <i class="ti ti-plane" aria-hidden="true"></i>
-                        Havalimanı (<span id="airport-count">0</span>)
-                    </div>
-                    <div id="airport-list" class="dh-modal-list"></div>
-                </div>
-            </div>
-        </div>
-    </div>
 </main>
 
 <footer class="dh-footer">
@@ -270,11 +193,13 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/tr.js"></script>
 <script src="{{ asset('js/tabs.js') }}"></script>
 <script src="{{ asset('js/search-form.js') }}"></script>
 <script src="{{ asset('js/fare-calendar.js') }}"></script>
 <script src="{{ asset('js/checkin.js') }}"></script>
 <script src="{{ asset('js/ticket-management.js') }}"></script>
 <script src="{{ asset('js/flight-status.js') }}"></script>
+<script src="/js/pax-dropdown-fit.js"></script>
 </body>
 </html>

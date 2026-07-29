@@ -70,13 +70,19 @@ class FlightScheduleService
         };
     }
 
+
+    /**
+     * Filo büyüklüğü hesabında kullanılan varsayım (23 Temmuz 2026'da güncellendi):
+     * kısa mesafe (iç hat, ~1-2 saat) uçaklar günde 6 sefer, orta mesafe 2 sefer,
+     * uzun mesafe 1 sefer yapabilir. Önceki 4 sefer/gün varsayımı fazla muhafazakârdı.
+     */
     private function estimatedFlightHours(Route $route): int
     {
-        return match (true) {
-            $route->base_price <= 800  => 1,
-            $route->base_price <= 3500 => 3,
-            $route->base_price <= 9000 => 11,
-            default                    => 13,
+        return match ($route->getRangeCategory()) {
+            'short'      => 1,
+            'medium'     => 3,
+            'long'       => 11,
+            'ultra_long' => 13,
         };
     }
 }

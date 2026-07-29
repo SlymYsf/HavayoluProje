@@ -22,5 +22,7 @@ class DatabaseSeeder extends Seeder
             AirportSeeder::class,
             RouteSeeder::class,
         ]);
+
+        $this->call(CountrySeeder::class);
     }
 }

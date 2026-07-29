@@ -20,6 +20,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(\App\Services\TicketService::class);
         $this->app->singleton(\App\Services\CompensationService::class);
         $this->app->singleton(\App\Services\FlightScheduleService::class);
+        $this->app->bind(
+            \App\Services\Payment\PaymentGatewayInterface::class,
+            \App\Services\Payment\MockPaymentGateway::class
+        );
     }
 
     /**
