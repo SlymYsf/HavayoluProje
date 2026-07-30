@@ -16,7 +16,7 @@ Route::get('/', [FlightSearchController::class, 'index']);
 
 Route::get('/ucus-sonuclari', fn () => view('flights.results'))->name('flights.results');
 Route::get('/check-in', fn () => view('flights.checkin'))->name('flights.checkin');
-
+Route::get('/bilet-yonetimi', fn () => view('flights.manage'))->name('flights.manage');
 /* ===== API ===== */
 
 Route::get('/api/airports', [FlightSearchController::class, 'airports']);
@@ -66,8 +66,12 @@ Route::get('/rezervasyon/zaman-asimi', function () {
 
 // Yalnızca yerel geliştirme: e-posta şablonunu tarayıcıda önizler.
 // Mailable döndürüldüğünde Laravel onu doğru içerik tipiyle render eder.
+// Yalnızca yerel geliştirme: e-posta şablonlarını tarayıcıda önizler.
+// Mailable döndürüldüğünde Laravel onu doğru içerik tipiyle render eder.
 if (app()->isLocal()) {
-    Route::get('/mail-onizleme/{pnr}', function (string $pnr) {
+
+    // Rezervasyon onayı
+    Route::get('/mail-onizleme/rezervasyon/{pnr}', function (string $pnr) {
         $tickets = \App\Models\Ticket::with([
             'passenger',
             'flight.route.originAirport',
@@ -80,5 +84,40 @@ if (app()->isLocal()) {
         abort_if($tickets->isEmpty(), 404, 'Bu PNR bulunamadı.');
 
         return new \App\Mail\ReservationConfirmed($pnr, $tickets, $tickets->sum('final_price'));
+    });
+
+    // Biniş kartı
+    Route::get('/mail-onizleme/binis-karti/{pnr}', function (string $pnr) {
+        $tickets = \App\Models\Ticket::with([
+            'passenger',
+            'flight.route.originAirport',
+            'flight.route.destinationAirport',
+            'flight.aircraft',
+        ])
+            ->where('pnr', $pnr)
+            ->get();
+
+        abort_if($tickets->isEmpty(), 404, 'Bu PNR bulunamadı.');
+
+        return new \App\Mail\BoardingPassIssued($pnr, $tickets->groupBy('flight_id')->first());
+    });
+
+    // Check-in hatırlatması
+    Route::get('/mail-onizleme/hatirlatma/{pnr}', function (string $pnr) {
+        $tickets = \App\Models\Ticket::with([
+            'passenger',
+            'flight.route.originAirport',
+            'flight.route.destinationAirport',
+        ])
+            ->where('pnr', $pnr)
+            ->get();
+
+        abort_if($tickets->isEmpty(), 404, 'Bu PNR bulunamadı.');
+
+        $leg = $tickets->groupBy('flight_id')->first();
+        $url = url('/check-in') . '?pnr=' . urlencode($pnr)
+            . '&last_name=' . urlencode($leg->first()->passenger->last_name);
+
+        return new \App\Mail\CheckInReminder($pnr, $leg, $url);
     });
 }

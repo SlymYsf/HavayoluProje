@@ -6,7 +6,10 @@
     <title>Rezervasyon Onayı — Devlet Havayolları</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/dh-theme.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dh-base.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dh-layout.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dh-components.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dh-booking.css') }}">
     <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
 </head>
 <body class="dh-results-body">
@@ -142,15 +145,59 @@
 </main>
 
 <script>
-    document.getElementById('pnr-copy').addEventListener('click', function () {
-        var btn = this;
-        navigator.clipboard.writeText(btn.dataset.pnr).then(function () {
-            btn.innerHTML = '<i class="ti ti-check"></i> Kopyalandı';
+    (function () {
+        var copyBtn = document.getElementById('pnr-copy');
+        if (!copyBtn) return;
+
+        copyBtn.addEventListener('click', function () {
+            var ok = copyText(copyBtn.dataset.pnr);
+
+            copyBtn.innerHTML = ok
+                ? '<i class="ti ti-check" aria-hidden="true"></i> Kopyalandı'
+                : '<i class="ti ti-alert-circle" aria-hidden="true"></i> Kopyalanamadı';
+
             setTimeout(function () {
-                btn.innerHTML = '<i class="ti ti-copy"></i> Kopyala';
+                copyBtn.innerHTML = '<i class="ti ti-copy" aria-hidden="true"></i> Kopyala';
             }, 2000);
         });
-    });
+
+        /**
+         * navigator.clipboard yalnızca güvenli bağlamda (HTTPS veya localhost)
+         * tanımlıdır. Proje HTTP üzerinden .test alan adıyla çalıştığı için
+         * doğrudan execCommand yedeğini kullanıyoruz — canlıda HTTPS olduğunda
+         * modern API devreye girer.
+         */
+        function copyText(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text);
+                return true;
+            }
+            return legacyCopy(text);
+        }
+
+        function legacyCopy(text) {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.top = '0';
+            ta.style.opacity = '0';
+
+            document.body.appendChild(ta);
+            ta.select();
+            ta.setSelectionRange(0, ta.value.length); // mobil Safari için
+
+            var ok = false;
+            try {
+                ok = document.execCommand('copy');
+            } catch (e) {
+                ok = false;
+            }
+
+            document.body.removeChild(ta);
+            return ok;
+        }
+    })();
 </script>
 </body>
 </html>

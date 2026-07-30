@@ -6,7 +6,10 @@
     <title>Devlet Havayolları — Uçuş Ara</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/dh-theme.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dh-base.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dh-layout.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dh-components.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dh-search.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
 </head>
@@ -82,8 +85,8 @@
                     Check-in <i class="ti ti-arrow-right" aria-hidden="true"></i>
                 </button>
                 <div class="dh-form-hints">
-                    <a href="#">PNR kodu nasıl bulunur?</a>
-                    <a href="#">Check-in ne zaman açılır?</a>
+                    <button type="button" class="dh-hint-link" data-help="pnr">PNR kodu nasıl bulunur?</button>
+                    <button type="button" class="dh-hint-link" data-help="checkin-time">Check-in ne zaman açılır?</button>
                 </div>
             </form>
         </div>
@@ -103,8 +106,8 @@
                 </div>
                 <button type="submit" class="dh-btn-primary"><i class="ti ti-arrow-right" aria-hidden="true"></i></button>
                 <div class="dh-form-hints">
-                    <a href="#">PNR kodu nasıl bulunur?</a>
-                    <a href="#">Rezervasyonumu nasıl değiştiririm?</a>
+                    <button type="button" class="dh-hint-link" data-help="pnr">PNR kodu nasıl bulunur?</button>
+                    <button type="button" class="dh-hint-link" data-help="checkin-time">Check-in ne zaman açılır?</button>
                 </div>
             </form>
         </div>
@@ -192,6 +195,8 @@
     <p class="dh-footer-copyright">Devlet Havayolları A.O. Her hakkı saklıdır. © 2026</p>
 </footer>
 
+@include('partials.help-modals')
+
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/tr.js"></script>
 <script src="{{ asset('js/tabs.js') }}"></script>
@@ -201,5 +206,6 @@
 <script src="{{ asset('js/ticket-management.js') }}"></script>
 <script src="{{ asset('js/flight-status.js') }}"></script>
 <script src="/js/pax-dropdown-fit.js"></script>
+<script src="{{ asset('js/help-modal.js') }}"></script>
 </body>
 </html>

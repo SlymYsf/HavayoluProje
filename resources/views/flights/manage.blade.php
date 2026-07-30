@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Check-in — Devlet Havayolları</title>
+    <title>Bilet Yönetimi — Devlet Havayolları</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/dh-base.css') }}">
@@ -20,17 +20,23 @@
             <img src="{{ asset('images/logo.png') }}" alt="Devlet Havayolları logosu">
             <span>Devlet Havayolları</span>
         </a>
-        <span class="dh-page-title">Check-in</span>
+        <span class="dh-page-title">Bilet yönetimi</span>
     </div>
 </header>
 
+<div class="dh-page-back-bar">
+    <a href="/" class="dh-page-back">
+        <i class="ti ti-arrow-left" aria-hidden="true"></i> Ana sayfaya dön
+    </a>
+</div>
+
 <main class="dh-results-main">
-    <div id="checkin-view" class="dh-checkin-view">
-        <p class="dh-msg">Bilet bilgileri alınıyor...</p>
+
+    <div id="manage-view" class="dh-checkin-view">
+        <p class="dh-msg">Rezervasyon bilgileri alınıyor...</p>
     </div>
 </main>
 
-<script src="{{ asset('js/nav-guard.js') }}"></script>
-<script src="{{ asset('js/checkin-result.js') }}"></script>
+<script src="{{ asset('js/manage-result.js') }}"></script>
 </body>
 </html>

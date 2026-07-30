@@ -1,0 +1,1220 @@
+/**
+ * dh-search.css — Uçuş arama akışı: ana sayfa ve uçuş sonuçları.
+ *
+ * Arama formu, otomatik tamamlama, uçuş noktaları modalı, tarih seçici teması,
+ * fiyat şeridi ve uçuş kartları.
+ */
+
+/* ===== ARAMA KARTI ===== */
+
+.dh-search-card {
+    background: #FFFFFF;
+    border-radius: 0 0 14px 14px;
+    padding: 26px 30px 30px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* Sonuç sayfasında sekme yok, üst köşeler de yuvarlansın */
+.dh-results-body .dh-search-card {
+    border-radius: 12px;
+}
+
+.dh-results-searchbar {
+    background: transparent;
+}
+
+.dh-trip-type {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 0.5px solid var(--dh-border);
+}
+
+.dh-results-body .dh-trip-type {
+    padding-top: 4px;
+}
+
+.dh-search-form-v2 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: stretch;
+}
+
+.dh-form-actions {
+    flex: 1 1 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+}
+
+.dh-search-submit {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 32px;
+    font-size: 15px;
+}
+
+/* ===== NEREDEN / NEREYE ===== */
+
+.dh-route-field {
+    flex: 2 1 340px;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 26px;
+    position: relative;
+}
+
+.dh-route-half {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    padding: 9px 18px;
+    background: var(--dh-cloud);
+    border-radius: 8px;
+    height: 60px;
+    box-sizing: border-box;
+}
+
+.dh-route-half label {
+    display: block;
+    font-size: 12px;
+    line-height: 1.2;
+    color: var(--dh-muted);
+    margin-bottom: 3px;
+}
+
+.dh-route-half select {
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 17px;
+    line-height: 1.2;
+    font-weight: 500;
+    font-family: 'Space Grotesk', sans-serif;
+    width: 100%;
+    color: var(--dh-ink);
+}
+
+.dh-route-input {
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 18px;
+    line-height: 1.2;
+    font-weight: 500;
+    font-family: 'Space Grotesk', sans-serif;
+    width: 100%;
+    color: var(--dh-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dh-route-input::placeholder {
+    color: var(--dh-placeholder);
+    font-weight: 400;
+    font-size: 16px;
+}
+
+.dh-route-input-hidden {
+    display: none;
+}
+
+/* Seçim yapıldıktan sonra iki satırlı görünüm: şehir + havalimanı */
+.dh-route-selected {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.dh-route-city {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--dh-ink);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dh-route-subtitle {
+    font-size: 12px;
+    color: var(--dh-muted);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dh-route-fixed {
+    font-size: 17px;
+    line-height: 1.2;
+    font-weight: 500;
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--dh-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dh-swap-btn {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 0.5px solid var(--dh-border);
+    color: var(--dh-red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 17px;
+    z-index: 1;
+    margin: 0;
+    padding: 0;
+}
+
+/* ===== TARİH ALANLARI ===== */
+
+.dh-date-field {
+    flex: 1 1 150px;
+    background: var(--dh-cloud);
+    border-radius: 8px;
+    padding: 9px 18px;
+    height: 60px;
+    box-sizing: border-box;
+}
+
+.dh-date-field label {
+    display: block;
+    font-size: 12px;
+    line-height: 1.2;
+    color: var(--dh-muted);
+    margin-bottom: 3px;
+}
+
+.dh-date-field input {
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 17px;
+    line-height: 1.3;
+    font-weight: 500;
+    font-family: 'IBM Plex Sans', sans-serif;
+    width: 100%;
+    color: var(--dh-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ===== YOLCU VE KABİN SEÇİMİ ===== */
+
+.dh-passenger-wrapper {
+    position: relative;
+    flex: 1 1 140px;
+}
+
+.dh-passenger-field {
+    background: var(--dh-cloud);
+    border-radius: 8px;
+    padding: 9px 18px;
+    height: 60px;
+    box-sizing: border-box;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+/* Not: eski sürümde hover seçicisindeki nokta eksikti, kural hiç çalışmıyordu */
+.dh-passenger-field:hover,
+.dh-passenger-field.active {
+    border-color: var(--dh-border);
+    background: #FFFFFF;
+}
+
+.dh-passenger-field label {
+    display: block;
+    font-size: 12px;
+    line-height: 1.2;
+    color: var(--dh-muted);
+    margin-bottom: 3px;
+}
+
+.dh-pax-main-text {
+    display: block;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--dh-ink);
+    line-height: 1.2;
+}
+
+.dh-pax-sub-text {
+    display: block;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--dh-muted);
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+/* Yükseklik sınırını pax-dropdown-fit.js gerçek boşluğa göre günceller */
+.dh-passenger-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    width: 340px;
+    max-height: var(--dh-pax-max);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: #FFFFFF;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 50;
+    padding: 18px;
+    border: 1px solid var(--dh-border);
+}
+
+/* Altta yer yoksa panel yukarı açılır (sınıfı JS ekler) */
+.dh-passenger-dropdown.dh-drop-up {
+    top: auto;
+    bottom: calc(100% + 4px);
+}
+
+.dh-dropdown-header {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--dh-ink);
+    margin-bottom: 12px;
+}
+
+.dh-cabin-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.dh-cabin-tab {
+    flex: 1;
+    border: 1px solid var(--dh-border);
+    border-radius: 6px;
+    padding: 10px 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--dh-muted);
+}
+
+.dh-cabin-tab input {
+    display: none;
+}
+
+.dh-cabin-tab.active {
+    border-color: var(--dh-ink);
+    color: var(--dh-ink);
+}
+
+.dh-cabin-tab.active .dh-radio-circle {
+    border-color: #0066CC;
+}
+
+.dh-cabin-tab.active .dh-radio-circle::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background: #0066CC;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.dh-pax-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.dh-pax-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--dh-cloud);
+}
+
+.dh-pax-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.dh-pax-info strong {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--dh-ink);
+}
+
+.dh-pax-info strong i {
+    font-size: 16px;
+    color: var(--dh-ink);
+}
+
+.dh-pax-info span {
+    font-size: 12px;
+    color: var(--dh-muted);
+    display: block;
+    margin-top: 2px;
+}
+
+.dh-pax-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dh-pax-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: none;
+    background: #E8F0FE;
+    color: #0066CC;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dh-pax-btn:disabled {
+    background: var(--dh-cloud);
+    color: var(--dh-placeholder);
+    cursor: not-allowed;
+}
+
+.dh-pax-count {
+    font-size: 15px;
+    font-weight: 500;
+    min-width: 12px;
+    text-align: center;
+}
+
+/* Taslak/kesin durum: değişiklikler Uygula'ya basılana kadar geçici */
+.dh-pax-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-top: 12px;
+    margin-top: 12px;
+    border-top: 1px solid var(--dh-cloud);
+}
+
+.dh-pax-cancel {
+    background: none;
+    border: none;
+    color: var(--dh-muted);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+    padding: 8px 12px;
+}
+
+.dh-pax-cancel:hover {
+    color: var(--dh-ink);
+}
+
+.dh-pax-apply {
+    height: auto;
+    padding: 9px 20px;
+    font-size: 14px;
+}
+
+/* ===== BASİT FORMLAR (check-in, bilet yönetimi, uçuş durumu sekmeleri) ===== */
+
+.dh-simple-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 10px;
+    align-items: end;
+}
+
+.dh-form-hints {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 4px;
+}
+
+.dh-form-hints a {
+    font-size: 12px;
+    color: var(--dh-red);
+}
+
+.dh-form-hints a:hover {
+    text-decoration: underline;
+}
+
+/* ===== OTOMATİK TAMAMLAMA ===== */
+
+.dh-autocomplete {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 380px;
+    background: #FFFFFF;
+    border: 0.5px solid var(--dh-border);
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 20;
+}
+
+.dh-autocomplete-item {
+    padding: 8px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    border-bottom: 0.5px solid var(--dh-border);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dh-autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.dh-autocomplete-item:hover {
+    background: var(--dh-cloud);
+}
+
+.dh-autocomplete-city {
+    font-weight: 500;
+}
+
+.dh-autocomplete-meta {
+    font-size: 12px;
+    color: var(--dh-muted);
+}
+
+.dh-autocomplete-icon {
+    font-size: 15px;
+    margin-right: 8px;
+    color: var(--dh-muted);
+    vertical-align: -2px;
+}
+
+.dh-autocomplete-all {
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--dh-red);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dh-autocomplete-all:hover {
+    background: var(--dh-red-tint);
+}
+
+.dh-autocomplete-empty {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--dh-muted);
+}
+
+/* ===== TÜM UÇUŞ NOKTALARI MODALI ===== */
+
+.dh-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.dh-modal[hidden] {
+    display: none;
+}
+
+.dh-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.dh-modal-box {
+    position: relative;
+    background: #FFFFFF;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 760px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.dh-modal-header {
+    background: var(--dh-dark);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 16px 20px;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.dh-modal-close {
+    background: none;
+    border: none;
+    color: #FFFFFF;
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.dh-modal-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+    flex: 1;
+}
+
+.dh-modal-col {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-right: 0.5px solid var(--dh-border);
+}
+
+.dh-modal-col:last-child {
+    border-right: none;
+}
+
+.dh-modal-col-title {
+    padding: 14px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    border-bottom: 0.5px solid var(--dh-border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dh-modal-list {
+    overflow-y: auto;
+    flex: 1;
+}
+
+.dh-modal-item {
+    padding: 12px 20px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.dh-modal-item:hover {
+    background: var(--dh-cloud);
+}
+
+.dh-modal-item-active {
+    background: var(--dh-red-tint);
+    color: var(--dh-red-dark);
+    font-weight: 500;
+}
+
+.dh-modal-letter {
+    padding: 8px 20px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--dh-muted);
+    background: var(--dh-cloud);
+    position: sticky;
+    top: 0;
+}
+
+.dh-modal-hint {
+    padding: 16px 20px;
+    font-size: 13px;
+    color: var(--dh-muted);
+}
+
+/* ===== FLATPICKR — KURUMSAL TEMA ===== */
+
+.flatpickr-calendar {
+    font-family: 'IBM Plex Sans', sans-serif;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+    background: var(--dh-red);
+    border-color: var(--dh-red);
+}
+
+.flatpickr-day.selected:hover {
+    background: var(--dh-red-dark);
+    border-color: var(--dh-red-dark);
+}
+
+.flatpickr-day.today {
+    border-color: var(--dh-red-tint-strong);
+}
+
+.flatpickr-day:hover {
+    background: var(--dh-red-tint);
+    border-color: var(--dh-red-tint);
+}
+
+.flatpickr-months .flatpickr-month {
+    color: var(--dh-ink);
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+}
+
+.flatpickr-weekday {
+    color: var(--dh-muted);
+    font-size: 12px;
+}
+
+/* Gidiş-dönüş aralığı vurgusu (sınıfları search-form.js ekler) */
+.flatpickr-day.dh-in-range {
+    background: var(--dh-red-tint);
+    border-color: var(--dh-red-tint);
+    color: var(--dh-red-dark);
+    border-radius: 0;
+}
+
+.flatpickr-day.dh-in-range:hover {
+    background: var(--dh-red-tint-strong);
+    border-color: var(--dh-red-tint-strong);
+    color: #FFFFFF;
+}
+
+.flatpickr-day.dh-range-start,
+.flatpickr-day.dh-range-end {
+    background: var(--dh-red);
+    border-color: var(--dh-red);
+    color: #FFFFFF;
+    font-weight: 600;
+}
+
+.flatpickr-day.dh-range-start {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.flatpickr-day.dh-range-end {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+/* ===== ÜCRET TAKVİMİ ===== */
+
+.dh-fare-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin: 22px 0;
+    padding: 0 24px;
+}
+
+.dh-calendar-day {
+    border: 0.5px solid var(--dh-border);
+    border-radius: 8px;
+    padding: 8px 4px;
+    text-align: center;
+    cursor: pointer;
+    background: #FFFFFF;
+}
+
+.dh-calendar-day:hover {
+    border-color: var(--dh-red);
+}
+
+.dh-calendar-day-num {
+    font-size: 12px;
+    color: var(--dh-muted);
+}
+
+.dh-calendar-day-price {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.dh-calendar-day-cheapest {
+    background: var(--dh-red-tint);
+    border: 1.5px solid var(--dh-red);
+}
+
+.dh-calendar-day-cheapest .dh-calendar-day-num,
+.dh-calendar-day-cheapest .dh-calendar-day-price {
+    color: var(--dh-red-dark);
+    font-weight: 500;
+}
+
+/* ===== FİYAT ŞERİDİ ===== */
+
+.dh-fare-strip-section {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.dh-fare-strip-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.dh-fare-strip-badge {
+    background: var(--dh-red);
+    color: #FFFFFF;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 4px 14px;
+    border-radius: 4px;
+}
+
+.dh-fare-strip-route {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--dh-ink);
+}
+
+.dh-fare-strip {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+}
+
+.dh-strip-arrow {
+    flex: 0 0 40px;
+    background: #FFFFFF;
+    border: 1px solid var(--dh-border);
+    border-radius: 8px;
+    color: var(--dh-muted);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dh-strip-arrow:hover {
+    border-color: var(--dh-red);
+    color: var(--dh-red);
+}
+
+.dh-strip-days {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.dh-strip-day {
+    background: #FFFFFF;
+    border: 1px solid var(--dh-border);
+    border-radius: 8px;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: center;
+}
+
+.dh-strip-day:hover:not(.dh-strip-day-disabled) {
+    border-color: var(--dh-red);
+}
+
+.dh-strip-day-active {
+    border: 2px solid var(--dh-red);
+    background: var(--dh-red-tint);
+}
+
+.dh-strip-day-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.dh-strip-daynum {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--dh-ink);
+    line-height: 1;
+}
+
+.dh-strip-daymonth {
+    font-size: 10px;
+    color: var(--dh-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.dh-strip-dayweek {
+    font-size: 11px;
+    color: var(--dh-muted);
+    margin-bottom: 4px;
+}
+
+.dh-strip-price {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--dh-red-dark);
+    margin-top: 2px;
+}
+
+.dh-strip-price-none {
+    color: var(--dh-placeholder);
+}
+
+.dh-strip-day-active .dh-strip-price {
+    color: var(--dh-red);
+    font-weight: 600;
+}
+
+.dh-strip-loading,
+.dh-strip-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 20px;
+    color: var(--dh-muted);
+    font-size: 13px;
+}
+
+/* ===== UÇUŞ SONUÇLARI ===== */
+
+.dh-results-summary {
+    background: #FFFFFF;
+    border: 0.5px solid var(--dh-border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.dh-results-route {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.dh-results-meta {
+    font-size: 13px;
+    color: var(--dh-muted);
+}
+
+.dh-results-edit-link {
+    margin-left: auto;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--dh-red);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dh-results-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    margin: 16px 0 10px;
+    color: var(--dh-ink);
+}
+
+.dh-flight-results {
+    padding: 0 24px;
+}
+
+.dh-results-body .dh-flight-results {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.dh-flight-card {
+    border: 0.5px solid var(--dh-border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 10px;
+    background: #FFFFFF;
+}
+
+.dh-flight-summary {
+    flex: 1 1 260px;
+    min-width: 220px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dh-flight-time {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.dh-flight-path {
+    flex: 1;
+    min-width: 80px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dh-flight-path-line {
+    flex: 1;
+    border-top: 2px dashed var(--dh-red-tint-strong);
+    height: 1px;
+    position: relative;
+    margin-top: 8px;
+}
+
+.dh-flight-path-code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--dh-muted);
+}
+
+.dh-flight-duration {
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: var(--dh-muted);
+    background: #FFFFFF;
+    padding: 0 6px;
+    white-space: nowrap;
+}
+
+.dh-plane-icon {
+    position: absolute;
+    top: -9px;
+    font-size: 16px;
+    color: var(--dh-red);
+    left: 25%;
+}
+
+.dh-flight-number {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--dh-muted);
+}
+
+.dh-flight-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex: 0 0 auto;
+}
+
+.dh-aircraft-badge {
+    background: var(--dh-cloud);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 11px;
+    color: var(--dh-muted);
+    white-space: nowrap;
+}
+
+/* ===== ÜCRET SEÇENEKLERİ ===== */
+
+.dh-flight-fares {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex: 2 1 320px;
+}
+
+.dh-fare-option {
+    flex: 1 1 130px;
+    min-width: 120px;
+    position: relative;
+    background: #FFFFFF;
+    border: 1px solid var(--dh-border);
+    border-radius: 8px;
+    padding: 10px 14px 10px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+}
+
+.dh-fare-option:hover {
+    border-color: var(--dh-red-tint-strong);
+}
+
+.dh-fare-radio {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 1.5px solid var(--dh-placeholder);
+}
+
+.dh-fare-option-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--dh-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.dh-fare-option-price {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--dh-ink);
+}
+
+.dh-fare-option-hint {
+    font-size: 10px;
+    color: var(--dh-muted);
+    line-height: 1.3;
+}
+
+.dh-fare-option-selected {
+    border-color: var(--dh-red);
+    background: var(--dh-red-tint);
+}
+
+.dh-fare-option-selected .dh-fare-radio {
+    border-color: var(--dh-red);
+}
+
+.dh-fare-option-selected .dh-fare-radio::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: var(--dh-red);
+}
+
+.dh-fare-option-selected .dh-fare-option-label,
+.dh-fare-option-selected .dh-fare-option-price {
+    color: var(--dh-red-dark);
+}
+
+.dh-fare-pill {
+    background: var(--dh-red-tint);
+    color: var(--dh-red-dark);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.dh-fare-pill-business {
+    background: var(--dh-red);
+    color: var(--dh-red-tint);
+}
+
+/* ===== SONUÇ SAYFASI İLERİ AKSİYON BARI ===== */
+
+.dh-results-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    flex-wrap: wrap;
+}
+
+.dh-results-actions-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 200px;
+}
+
+.dh-selection-label {
+    font-size: 12px;
+    color: var(--dh-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.dh-selection-price {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--dh-ink);
+}
+
+.dh-selection-hint {
+    font-size: 13px;
+    color: var(--dh-muted);
+}
+
+.dh-continue-btn {
+    padding: 0 32px;
+    font-size: 15px;
+}
+
+.dh-continue-btn:disabled,
+.dh-continue-btn:disabled:hover {
+    background: var(--dh-cloud);
+    color: var(--dh-placeholder);
+    cursor: not-allowed;
+}

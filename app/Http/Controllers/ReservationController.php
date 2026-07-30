@@ -11,9 +11,10 @@ use Propaganistas\LaravelPhone\PhoneNumber;
 use App\Models\Ticket;
 use App\Services\TicketService;
 use App\Services\Payment\PaymentGatewayInterface;
-use App\Mail\ReservationConfirmed;
+use App\Jobs\SendReservationNotification;
+use App\Notifications\NotificationType;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
+
 
 class ReservationController extends Controller
 {
@@ -292,27 +293,13 @@ class ReservationController extends Controller
         }
 
         // Onay sayfası ve e-posta için ilişkileri yüklenmiş biletler
-        $tickets = Ticket::with([
-            'passenger',
-            'flight.route.originAirport',
-            'flight.route.destinationAirport',
-            'flight.aircraft',
-        ])
-            ->where('pnr', $result['pnr'])
-            ->get();
-
-        // E-posta gönderimi rezervasyonu bloklamaz: bilet oluştu, para alındı.
-        // Posta gitmezse kullanıcı yine de PNR'ını onay sayfasında görür.
-        try {
-            Mail::to($reservation['contact_email'])
-                ->send(new ReservationConfirmed($result['pnr'], $tickets, $tickets->sum('final_price')));
-        } catch (\Throwable $e) {
-            Log::error('Rezervasyon onay e-postası gönderilemedi.', [
-                'pnr'   => $result['pnr'],
-                'email' => $reservation['contact_email'],
-                'error' => $e->getMessage(),
-            ]);
-        }
+        // Bildirim kuyruğa gidiyor: ödeme yanıtı e-posta gönderimini beklemiyor,
+        // başarısız gönderimler işçi tarafından yeniden deneniyor.
+        SendReservationNotification::dispatch(
+            NotificationType::ReservationConfirmed,
+            $result['pnr'],
+            collect($result['tickets'])->pluck('id')->all()
+        );
 
 
         session()->forget(['reservation', 'reservation_expires_at']);
@@ -416,9 +403,14 @@ class ReservationController extends Controller
                 }
 
                 $type = $number->getType();
-                $name = is_object($type) && property_exists($type, 'name')
-                    ? $type->name
-                    : (string) $type;
+
+                // libphonenumber 9 native enum döndürüyor; eski sürümler string
+                // döndürebileceği için ikisini de karşılıyoruz.
+                $name = match (true) {
+                    $type instanceof \UnitEnum => $type->name,
+                    is_string($type)           => $type,
+                    default                    => '',
+                };
 
                 // FIXED_LINE_OR_MOBILE: bazı ülkeler (örn. ABD) cep ile sabit hattı
                 // numaradan ayırt edemez, o durumda reddetmek yanlış olur.

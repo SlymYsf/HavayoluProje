@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendReservationNotification;
+use App\Notifications\NotificationType;
 use App\Services\TicketService;
 use Illuminate\Http\Request;
 
@@ -12,27 +14,45 @@ class CheckInController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'pnr' => 'required|string',
+            'pnr'       => 'required|string',
             'last_name' => 'required|string',
+            'flight_id' => 'required|integer|exists:flights,id',
+        ], [
+            'flight_id.required' => 'Check-in yapılacak uçuş belirtilmedi.',
         ]);
 
-        $ticket = $this->ticketService->findByPnrAndSurname($validated['pnr'], $validated['last_name']);
+        $flightId = (int) $validated['flight_id'];
 
-        if (! $ticket) {
-            return response()->json(['error' => 'Bilet bulunamadı.'], 404);
-        }
+        // Zaten check-in yapılmışsa mükerrer bildirim göndermemek için önce durumu okuyoruz.
+        $before = $this->ticketService
+            ->findReservation($validated['pnr'], $validated['last_name'])
+            ->where('flight_id', $flightId);
+
+        $alreadyDone = $before->isNotEmpty()
+            && $before->every(fn ($t) => $t->checked_in_at !== null);
 
         try {
-            $ticket = $this->ticketService->checkIn($ticket);
-        } catch (\InvalidArgumentException|\RuntimeException $e) {
+            $tickets = $this->ticketService->checkInFlight(
+                $validated['pnr'],
+                $validated['last_name'],
+                $flightId
+            );
+        } catch (\InvalidArgumentException | \RuntimeException $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }
 
-        return response()->json([
-            'pnr' => $ticket->pnr,
-            'seat_number' => $ticket->seat_number,
-            'checked_in_at' => $ticket->checked_in_at,
-            'flight' => $ticket->flight->only(['flight_number', 'departure_time']),
-        ]);
+        if (! $alreadyDone) {
+            // Bildirim kuyruğa gidiyor: yanıt e-posta ve SMS gönderimini beklemiyor,
+            // başarısız gönderimler işçi tarafından yeniden deneniyor.
+            SendReservationNotification::dispatch(
+                NotificationType::BoardingPass,
+                $validated['pnr'],
+                $tickets->pluck('id')->all()
+            );
+        }
+
+        // İstemci güncel durumu tek kaynaktan alsın diye rezervasyonun
+        // tamamını döndürüyoruz — kısmi güncelleme yerine tam yenileme.
+        return app(TicketManagementController::class)->show($request);
     }
 }

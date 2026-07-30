@@ -1,0 +1,42 @@
+/**
+ * dh-base.css — Tasarım belirteçleri ve temel sıfırlama.
+ *
+ * Her sayfa ilk olarak bunu yükler. Diğer dosyalar buradaki değişkenlere
+ * bağımlıdır; yükleme sırası base → layout → components → sayfa dosyası.
+ */
+
+:root {
+    --dh-red: #C8102E;
+    --dh-red-dark: #8C0A20;
+    --dh-red-tint: #FCE9EC;
+    --dh-red-tint-strong: #F09595;
+    --dh-ink: #1C1A1B;
+    --dh-cloud: #F4F4F6;
+    --dh-dark: #161414;
+    --dh-border: #E2E1DC;
+    --dh-muted: #5F5E5A;
+    --dh-placeholder: #B4B2A9;
+    --dh-max: 1080px;
+
+    /* pax-dropdown-fit.js panel açılınca gerçek boşlukla günceller;
+       buradaki değer JS yüklenmezse kullanılan yedek. */
+    --dh-pax-max: min(440px, calc(100vh - 200px));
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: var(--dh-ink);
+    line-height: 1.5;
+    background: #FFFFFF;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}

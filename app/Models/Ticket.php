@@ -16,6 +16,12 @@ class Ticket extends Model
         'final_price',
         'status',
         'checked_in_at',
+        'reminder_sent_at',
+    ];
+
+    protected $casts = [
+        'checked_in_at' => 'datetime',
+        'reminder_sent_at' => 'datetime',
     ];
 
     public function flight()

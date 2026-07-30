@@ -7,6 +7,7 @@ use App\Models\Passenger;
 use App\Models\Ticket;
 use App\Services\Pricing\PricingService;
 use Illuminate\Support\Facades\DB;
+use App\Services\Notifications\ReminderService;
 
 class TicketService
 {
@@ -23,6 +24,7 @@ class TicketService
     public function __construct(
         private FlightService $flightService,
         private PricingService $pricingService,
+        private ReminderService $reminderService,
     ) {}
 
     /**
@@ -96,6 +98,14 @@ class TicketService
 
                 $leg['flight']->increment('sold_seats', $seatCount);
             }
+            // Hatırlatma kayıtları rezervasyonla aynı transaction'da oluşuyor:
+            // bilet varsa hatırlatması da vardır.
+            foreach ($legs as $leg) {
+                foreach (\App\Notifications\ReminderType::cases() as $reminderType) {
+                    $this->reminderService->schedule($pnr, $leg['flight'], $reminderType);
+                }
+            }
+
 
             return ['pnr' => $pnr, 'tickets' => $tickets];
         });
@@ -304,20 +314,6 @@ class TicketService
         return $result['tickets'][0];
     }
 
-    /** PNR'a ait tüm biletler (rezervasyondaki her yolcu ve her bacak). */
-    public function findAllByPnrAndSurname(string $pnr, string $lastName)
-    {
-        return Ticket::with(['passenger', 'flight.route.originAirport', 'flight.route.destinationAirport'])
-            ->where('pnr', $pnr)
-            ->whereHas('passenger', fn ($q) => $q->where('last_name', $lastName))
-            ->get();
-    }
-
-    public function findByPnrAndSurname(string $pnr, string $lastName): ?Ticket
-    {
-        return $this->findAllByPnrAndSurname($pnr, $lastName)->first();
-    }
-
     public function checkIn(Ticket $ticket): Ticket
     {
         if ($ticket->status !== 'confirmed') {
@@ -360,8 +356,10 @@ class TicketService
     {
         $now = now();
 
+        // Kalkıştan 20 dakika önce kapanır: bu andan sonra biniş kartı
+        // basmak operasyonel olarak anlamsız.
         return $now->gte($this->checkInOpensAt($ticket))
-            && $now->lt($ticket->flight->departure_time);
+            && $now->lt($ticket->flight->departure_time->copy()->subMinutes(20));
     }
 
     public function cancelTicket(Ticket $ticket): Ticket
@@ -386,6 +384,82 @@ class TicketService
             }
 
             return $ticket;
+        });
+    }
+
+
+    public function findReservation(string $pnr, string $lastName): \Illuminate\Support\Collection
+    {
+        $authorized = Ticket::where('pnr', $pnr)
+            ->whereHas('passenger', fn ($q) => $q->where('last_name', $lastName))
+            ->exists();
+
+        if (! $authorized) {
+            return collect();
+        }
+
+        return Ticket::with([
+            'passenger',
+            'flight.route.originAirport',
+            'flight.route.destinationAirport',
+            'flight.aircraft',
+        ])
+            ->where('pnr', $pnr)
+            ->orderBy('flight_id')
+            ->orderBy('id')
+            ->get();
+    }
+
+    /**
+     * Bir uçuştaki tüm yolcuları check-in yapar.
+     * Zaten check-in yapılmış biletler atlanır, hata verilmez.
+     *
+     * @return \Illuminate\Support\Collection İşlem sonrası o uçuşun biletleri
+     */
+    public function checkInFlight(string $pnr, string $lastName, int $flightId): \Illuminate\Support\Collection
+    {
+        $reservation = $this->findReservation($pnr, $lastName);
+
+        if ($reservation->isEmpty()) {
+            throw new \InvalidArgumentException('Rezervasyon bulunamadı.');
+        }
+
+        $tickets = $reservation->where('flight_id', $flightId);
+
+        if ($tickets->isEmpty()) {
+            throw new \InvalidArgumentException('Bu uçuş rezervasyonda bulunmuyor.');
+        }
+
+        return DB::transaction(function () use ($tickets) {
+            foreach ($tickets as $ticket) {
+                if ($ticket->checked_in_at !== null) {
+                    continue; // zaten yapılmış, sessizce geç
+                }
+                $this->checkIn($ticket);
+            }
+
+            return $tickets->map(fn ($t) => $t->refresh());
+        });
+    }
+
+    /** Rezervasyondaki tüm biletleri iptal eder. */
+    public function cancelReservation(string $pnr, string $lastName): \Illuminate\Support\Collection
+    {
+        $tickets = $this->findReservation($pnr, $lastName);
+
+        if ($tickets->isEmpty()) {
+            throw new \InvalidArgumentException('Rezervasyon bulunamadı.');
+        }
+
+        return DB::transaction(function () use ($tickets,$pnr) {
+            foreach ($tickets as $ticket) {
+                if ($ticket->status === 'confirmed') {
+                    $this->cancelTicket($ticket);
+                }
+            }
+            $this->reminderService->cancelForReservation($pnr);
+
+            return $tickets->map(fn ($t) => $t->refresh());
         });
     }
 }

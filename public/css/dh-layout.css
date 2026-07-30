@@ -1,0 +1,348 @@
+/**
+ * dh-layout.css — Sayfa iskeleti: başlık, sekmeler, ana içerik, altbilgi.
+ *
+ * Sayfaya özgü içerik kutuları burada değil; yalnızca her sayfada tekrarlanan
+ * çerçeve öğeleri bulunur.
+ */
+
+/* ===== BAŞLIK ===== */
+
+.dh-header {
+    background: linear-gradient(135deg, #0A0809 0%, #1C0E11 35%, #3D1219 65%, #5C1A22 100%);
+}
+
+.dh-header-utility {
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+    padding: 10px 24px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.dh-header-main {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 14px 24px 28px;
+}
+
+.dh-header-slim .dh-header-main {
+    padding: 14px 24px;
+    gap: 40px;
+}
+
+.dh-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dh-logo img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    background: #FFFFFF;
+    border-radius: 50%;
+    padding: 6px;
+    box-sizing: border-box;
+}
+
+.dh-logo span {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: #FFFFFF;
+}
+
+.dh-page-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+    margin-left: 24px;
+    padding-left: 24px;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dh-main-nav {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 20px;
+}
+
+.dh-main-nav a {
+    font-size: 13px;
+    font-weight: 500;
+    color: #FFFFFF;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    padding: 0 10px;
+}
+
+.dh-main-nav a:hover {
+    color: var(--dh-red-tint-strong);
+}
+
+.dh-nav-sep {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 12px;
+}
+
+.dh-login-btn {
+    background: none;
+    border: 0.5px solid rgba(255, 255, 255, 0.4);
+    color: #FFFFFF;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+}
+
+/* ===== REZERVASYON ADIM GÖSTERGESİ ===== */
+
+.dh-stepper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.dh-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.55);
+    position: relative;
+}
+
+.dh-step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: -8px;
+    width: 16px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.dh-step-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+}
+
+.dh-step-label {
+    font-weight: 500;
+}
+
+.dh-step-active {
+    color: #FFFFFF;
+    background: var(--dh-red);
+    border-radius: 8px;
+}
+
+.dh-step-done {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.dh-step-done .dh-step-icon {
+    color: var(--dh-red-tint-strong);
+}
+
+/* ===== SEKMELER ===== */
+
+.dh-tabs {
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    max-width: var(--dh-max);
+    margin: 0 auto;
+    gap: 6px;
+}
+
+.dh-tab {
+    background: var(--dh-cloud);
+    border: 0.5px solid var(--dh-border);
+    border-radius: 10px 10px 0 0;
+    padding: 14px 24px;
+    font-size: 14px;
+    color: var(--dh-muted);
+    font-family: 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dh-tab-active {
+    background: #FFFFFF;
+    color: var(--dh-red-dark);
+    font-weight: 500;
+    border-bottom-color: #FFFFFF;
+}
+
+/* ===== ANA İÇERİK ===== */
+
+main {
+    min-height: 700px;
+    display: flex;
+    flex-direction: column;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),
+        url('/images/hero-plane.jpg');
+    background-size: cover;
+    background-position: center 65%;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    padding-top: 90px;
+    padding-bottom: 40px;
+}
+
+.dh-panel {
+    width: 100%;
+    padding: 0 0 24px;
+    max-width: var(--dh-max);
+    margin: 0 auto;
+}
+
+/* Ana sayfa dışındaki sayfalar: düz gri zemin, hero görseli yok */
+.dh-results-body {
+    background: var(--dh-cloud);
+}
+
+.dh-results-body main {
+    background-image: none;
+    background-color: var(--dh-cloud);
+}
+
+.dh-results-main {
+    max-width: var(--dh-max);
+    margin: 0 auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ===== SAYFA ÜSTÜ GERİ BAĞLANTISI ===== */
+
+.dh-page-back-bar {
+    max-width: var(--dh-max);
+    margin: 0 auto;
+    padding: 16px 24px 0;
+}
+
+.dh-page-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--dh-red);
+}
+
+.dh-page-back:hover {
+    color: var(--dh-red-dark);
+    text-decoration: underline;
+}
+
+/* ===== ALTBİLGİ ===== */
+
+.dh-footer {
+    background: var(--dh-dark);
+    color: rgba(255, 255, 255, 0.75);
+    padding: 28px 24px 0;
+}
+
+.dh-footer-columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
+    max-width: var(--dh-max);
+    margin: 0 auto;
+    padding-bottom: 24px;
+}
+
+.dh-footer h3 {
+    color: var(--dh-red-tint-strong);
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.dh-footer ul {
+    list-style: none;
+}
+
+.dh-footer li {
+    line-height: 2.1;
+    font-size: 12px;
+}
+
+.dh-footer-bottom {
+    max-width: var(--dh-max);
+    margin: 0 auto;
+    border-top: 0.5px solid rgba(255, 255, 255, 0.15);
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.dh-footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dh-footer-brand img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    background: #FFFFFF;
+    border-radius: 50%;
+    padding: 4px;
+    box-sizing: border-box;
+}
+
+.dh-footer-brand span {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+}
+
+.dh-footer-social {
+    display: flex;
+    gap: 16px;
+    font-size: 16px;
+}
+
+.dh-footer-legal {
+    max-width: var(--dh-max);
+    margin: 0 auto;
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    padding: 12px 0;
+    border-top: 0.5px solid rgba(255, 255, 255, 0.15);
+}
+
+.dh-footer-copyright {
+    max-width: var(--dh-max);
+    margin: 0 auto;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 12px 0 20px;
+}

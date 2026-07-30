@@ -24,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
             \App\Services\Payment\PaymentGatewayInterface::class,
             \App\Services\Payment\MockPaymentGateway::class
         );
+        $this->app->bind(
+            \App\Services\Sms\SmsGatewayInterface::class,
+            \App\Services\Sms\LogSmsGateway::class
+        );
     }
 
     /**

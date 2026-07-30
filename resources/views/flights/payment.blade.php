@@ -6,7 +6,10 @@
     <title>Ödeme — Devlet Havayolları</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/dh-theme.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dh-base.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dh-layout.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dh-components.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dh-booking.css') }}">
     <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
 </head>
 <body class="dh-results-body">
