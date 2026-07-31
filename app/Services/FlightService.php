@@ -17,6 +17,19 @@ class FlightService
         'Tamamlandı' => [],
     ];
 
+    /**
+     * Gün içi saat dilimleri. Sunucu tarafı tek doğru kaynak; istemci
+     * yalnızca anahtar gönderiyor.
+     */
+    private const TIME_SLOTS = [
+        'midnight'  => ['00:00:00', '06:00:00'],
+        'morning'   => ['06:00:00', '10:00:00'],
+        'noon'      => ['10:00:00', '14:00:00'],
+        'afternoon' => ['14:00:00', '18:00:00'],
+        'evening'   => ['18:00:00', '22:00:00'],
+        'night'     => ['22:00:00', '23:59:59'],
+    ];
+
     public function canAssignAircraft(Aircraft $aircraft, Route $route): bool
     {
         // Geniş gövde + iç hat → sadece belirlenmiş hub varışlarına
@@ -121,6 +134,8 @@ class FlightService
         return $number;
     }
 
+    // ===== UÇUŞ DURUMU SORGULARI =====
+
     public function findByNumberAndDate(string $flightNumber, string $date): ?Flight
     {
         return Flight::where('flight_number', $flightNumber)
@@ -128,7 +143,77 @@ class FlightService
             ->first();
     }
 
+    /**
+     * Bir veya birden çok havalimanından belirli gün kalkan uçuşlar.
+     *
+     * Şehir seçildiğinde birden çok havalimanı kimliği gelir (Londra →
+     * LHR, LGW, STN). Hub havalimanlarında günde yüzlerce uçuş olabildiği
+     * için sonuç sınırlanıyor; bu ekran zaman çizelgesi değil, sorgu aracı.
+     *
+     * @param int[] $airportIds
+     */
+    public function findDeparturesFrom(array $airportIds, string $date, ?string $timeSlot = null, int $limit = 50)
+    {
+        $query = Flight::with(['route.originAirport', 'route.destinationAirport', 'aircraft'])
+            ->whereDate('departure_time', $date)
+            ->whereHas('route', fn ($q) => $q->whereIn('origin_airport_id', $airportIds));
 
+        $this->applyTimeSlot($query, 'departure_time', $timeSlot);
 
+        return $query->orderBy('departure_time')->limit($limit)->get();
+    }
+
+    /**
+     * Bir veya birden çok havalimanına belirli gün inen uçuşlar.
+     *
+     * @param int[] $airportIds
+     */
+    public function findArrivalsTo(array $airportIds, string $date, ?string $timeSlot = null, int $limit = 50)
+    {
+        $query = Flight::with(['route.originAirport', 'route.destinationAirport', 'aircraft'])
+            ->whereDate('arrival_time', $date)
+            ->whereHas('route', fn ($q) => $q->whereIn('destination_airport_id', $airportIds));
+
+        $this->applyTimeSlot($query, 'arrival_time', $timeSlot);
+
+        return $query->orderBy('arrival_time')->limit($limit)->get();
+    }
+
+    /**
+     * İki nokta arasındaki belirli gün uçuşları.
+     *
+     * @param int[] $originIds
+     * @param int[] $destinationIds
+     */
+    public function findByRoute(array $originIds, array $destinationIds, string $date, int $limit = 50)
+    {
+        return Flight::with(['route.originAirport', 'route.destinationAirport', 'aircraft'])
+            ->whereDate('departure_time', $date)
+            ->whereHas('route', function ($q) use ($originIds, $destinationIds) {
+                $q->whereIn('origin_airport_id', $originIds)
+                    ->whereIn('destination_airport_id', $destinationIds);
+            })
+            ->orderBy('departure_time')
+            ->limit($limit)
+            ->get();
+    }
+
+    /** Bilinmeyen dilim anahtarı sessizce yok sayılır — filtre uygulanmaz. */
+    private function applyTimeSlot($query, string $column, ?string $slot): void
+    {
+        if (! $slot || ! isset(self::TIME_SLOTS[$slot])) {
+            return;
+        }
+
+        [$start, $end] = self::TIME_SLOTS[$slot];
+
+        $query->whereTime($column, '>=', $start)
+            ->whereTime($column, '<=', $end);
+    }
+
+    /** İstemciye açık dilim anahtarları — doğrulama için. */
+    public static function timeSlotKeys(): array
+    {
+        return array_keys(self::TIME_SLOTS);
+    }
 }
-

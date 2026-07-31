@@ -17,6 +17,11 @@
     --dh-muted: #5F5E5A;
     --dh-placeholder: #B4B2A9;
     --dh-max: 1080px;
+    /* mega-menu.js çalışma anında üzerine yazıyor; buradaki değerler
+       hem yedek hem de IDE'nin değişkeni çözebilmesi için. */
+    --dh-mega-left: 24px;
+    --dh-mega-right: 24px;
+    --dh-mega-min: 720px;
 
     /* pax-dropdown-fit.js panel açılınca gerçek boşlukla günceller;
        buradaki değer JS yüklenmezse kullanılan yedek. */

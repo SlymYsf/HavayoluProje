@@ -819,3 +819,186 @@
 .dh-checkin-actions .dh-checkin-error-btn {
     margin-top: 0;
 }
+
+/* ===== UÇUŞ DURUMU ===== */
+
+.dh-status-route {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 8px 0 24px;
+}
+
+.dh-status-endpoint {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.dh-status-endpoint-right {
+    align-items: flex-end;
+    text-align: right;
+}
+
+.dh-status-time {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--dh-ink);
+    line-height: 1.1;
+}
+
+.dh-status-code {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--dh-red);
+}
+
+.dh-status-city {
+    font-size: 13px;
+    color: var(--dh-muted);
+}
+
+.dh-status-middle {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding-top: 10px;
+    min-width: 80px;
+}
+
+.dh-status-duration {
+    font-size: 12px;
+    color: var(--dh-muted);
+}
+
+.dh-status-line {
+    width: 100%;
+    border-top: 2px dashed var(--dh-red-tint-strong);
+    display: flex;
+    justify-content: center;
+    color: var(--dh-red);
+    font-size: 16px;
+    margin-top: 8px;
+}
+
+.dh-status-line i {
+    transform: translateY(-11px);
+    background: #FFFFFF;
+    padding: 0 6px;
+}
+
+/* Durum rozetleri — planlandığından farklı her durum ayrı renkte */
+.dh-checkin-badge.dh-status-delayed {
+    background: #FFF4E5;
+    color: #8A5300;
+}
+
+.dh-checkin-badge.dh-status-cancelled {
+    background: var(--dh-cloud);
+    color: var(--dh-muted);
+    text-decoration: line-through;
+}
+
+.dh-checkin-badge.dh-status-done {
+    background: #E8F5E9;
+    color: #1B5E20;
+}
+
+.dh-checkin-note.dh-status-delayed {
+    background: #FFF4E5;
+    color: #8A5300;
+}
+
+.dh-checkin-note.dh-status-cancelled {
+    background: var(--dh-cloud);
+    color: var(--dh-muted);
+}
+
+.dh-checkin-note.dh-status-done {
+    background: #E8F5E9;
+    color: #1B5E20;
+}
+
+@media (max-width: 600px) {
+    .dh-status-time {
+        font-size: 22px;
+    }
+}
+
+/* ===== UÇUŞ DURUMU — ÇOKLU SONUÇ ===== */
+
+.dh-status-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 28px;
+}
+
+.dh-status-summary-date {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--dh-ink);
+    margin-top: 2px;
+}
+
+.dh-status-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--dh-cloud);
+}
+
+.dh-status-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.dh-status-row-number {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--dh-muted);
+    flex: 0 0 70px;
+}
+
+.dh-status-row-time {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--dh-ink);
+    flex: 0 0 60px;
+}
+
+.dh-status-row-route {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--dh-red);
+    flex: 1;
+    text-align: center;
+}
+
+.dh-status-row-badge {
+    flex: 0 0 auto;
+    font-size: 11px;
+    padding: 4px 10px;
+}
+
+@media (max-width: 640px) {
+    .dh-status-row {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .dh-status-row-route {
+        text-align: left;
+    }
+}

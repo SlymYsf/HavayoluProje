@@ -15,28 +15,8 @@
 </head>
 <body>
 
-<header class="dh-header">
-    <div class="dh-header-utility">
-        <a href="#">Yardım</a>
-        <a href="#"><i class="ti ti-search" aria-hidden="true"></i> Ara</a>
-        <span>TR</span>
-    </div>
-    <div class="dh-header-main">
-        <a href="/" class="dh-logo">
-            <img src="{{ asset('images/logo.png') }}" alt="Devlet Havayolları logosu">
-            <span>Devlet Havayolları</span>
-        </a>
-        <nav class="dh-main-nav">
-            <a href="#">Bilet al ve yönet</a>
-            <span class="dh-nav-sep">|</span>
-            <a href="#">Seyahat deneyimi</a>
-            <span class="dh-nav-sep">|</span>
-            <a href="#">Fırsatlar ve uçuş noktaları</a>
-            <span class="dh-nav-sep">|</span>
-            <a href="#">Yardım</a>
-        </nav>
-        <button class="dh-login-btn">Giriş yap</button>
-    </div>
+<header>
+    @include('partials.header')
 </header>
 
 <main>
@@ -116,19 +96,121 @@
 
     <section id="panel-durum" class="dh-panel" hidden>
         <div class="dh-search-card">
-            <form id="status-form" class="dh-simple-form">
-                <div class="dh-field">
+            <form id="status-form" class="dh-status-form">
+
+                <div class="dh-field dh-status-filter" id="status-filter-wrap">
+                    <span class="dh-filter-label" id="status-filter-label">Arama türü</span>
+                    <button type="button" class="dh-filter-trigger" id="status-filter-trigger"
+                            aria-haspopup="listbox" aria-expanded="false" aria-labelledby="status-filter-label">
+                        <span id="status-filter-text">Uçuş no</span>
+                        <i class="ti ti-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <input type="hidden" id="status-filter" value="number">
+
+                    <div class="dh-filter-panel" id="status-filter-panel" hidden role="listbox">
+                        <button type="button" class="dh-filter-item" data-value="number" role="option">Uçuş no</button>
+                        <button type="button" class="dh-filter-item" data-value="departure" role="option">Kalkış</button>
+                        <button type="button" class="dh-filter-item" data-value="arrival" role="option">Varış</button>
+                        <button type="button" class="dh-filter-item" data-value="route" role="option">Güzergâh</button>
+                    </div>
+                </div>
+
+                {{-- Uçuş no --}}
+                <div class="dh-field dh-status-input" data-for="number">
                     <label for="status-number">Uçuş numarası</label>
-                    <input type="text" id="status-number" name="flight_number" placeholder="DH1234">
+                    <div class="dh-prefix-input">
+                        <span class="dh-prefix">DH</span>
+                        <input type="text" id="status-number" inputmode="numeric"
+                               maxlength="4" placeholder="1234" autocomplete="off">
+                    </div>
                 </div>
-                <div class="dh-field">
+
+                {{-- Kalkış / Varış: tek havalimanı --}}
+                <div class="dh-route-half dh-status-input" data-for="departure arrival" hidden>
+                    <label for="status-airport-search" id="status-airport-label">Kalkış havalimanı</label>
+                    <input type="text" id="status-airport-search" class="dh-route-input"
+                           placeholder="Şehir ya da havalimanı" autocomplete="off">
+                    <input type="hidden" id="status-airport">
+                    <div id="status-airport-dropdown" class="dh-autocomplete" hidden></div>
+                </div>
+
+                {{-- Güzergâh: iki havalimanı --}}
+                <div class="dh-route-half dh-status-input" data-for="route" hidden>
+                    <label for="status-origin-search">Nereden</label>
+                    <input type="text" id="status-origin-search" class="dh-route-input"
+                           placeholder="Şehir ya da havalimanı" autocomplete="off">
+                    <input type="hidden" id="status-origin">
+                    <div id="status-origin-dropdown" class="dh-autocomplete" hidden></div>
+                </div>
+
+                <div class="dh-route-half dh-status-input" data-for="route" hidden>
+                    <label for="status-destination-search">Nereye</label>
+                    <input type="text" id="status-destination-search" class="dh-route-input"
+                           placeholder="Şehir ya da havalimanı" autocomplete="off">
+                    <input type="hidden" id="status-destination">
+                    <div id="status-destination-dropdown" class="dh-autocomplete" hidden></div>
+                </div>
+
+                {{-- Saat aralığı: yalnızca kalkış ve varış aramasında --}}
+                <div class="dh-field dh-status-slot dh-status-input" data-for="departure arrival" hidden>
+                    <span class="dh-filter-label" id="status-slot-label">Kalkış saati</span>
+                    <button type="button" class="dh-filter-trigger" id="status-slot-trigger"
+                            aria-haspopup="listbox" aria-expanded="false" aria-labelledby="status-slot-label">
+                        <span class="dh-slot-selected">
+                            <span class="dh-slot-name" id="status-slot-text">Tüm gün</span>
+                            <span class="dh-slot-range" id="status-slot-range">00:00-23:59</span>
+                        </span>
+                        <i class="ti ti-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <input type="hidden" id="status-slot" value="">
+
+                    <div class="dh-filter-panel" id="status-slot-panel" hidden role="listbox">
+                        <button type="button" class="dh-filter-item dh-slot-item" data-value="" data-name="Tüm gün" data-range="00:00-23:59" role="option">
+                            <span class="dh-slot-name">Tüm gün</span>
+                            <span class="dh-slot-range">00:00-23:59</span>
+                        </button>
+                        <button type="button" class="dh-filter-item dh-slot-item" data-value="morning" data-name="Sabah" data-range="06:00-10:00" role="option">
+                            <span class="dh-slot-name">Sabah</span>
+                            <span class="dh-slot-range">06:00-10:00</span>
+                        </button>
+                        <button type="button" class="dh-filter-item dh-slot-item" data-value="noon" data-name="Öğle" data-range="10:00-14:00" role="option">
+                            <span class="dh-slot-name">Öğle</span>
+                            <span class="dh-slot-range">10:00-14:00</span>
+                        </button>
+                        <button type="button" class="dh-filter-item dh-slot-item" data-value="afternoon" data-name="Öğleden sonra" data-range="14:00-18:00" role="option">
+                            <span class="dh-slot-name">Öğleden sonra</span>
+                            <span class="dh-slot-range">14:00-18:00</span>
+                        </button>
+                        <button type="button" class="dh-filter-item dh-slot-item" data-value="evening" data-name="Akşam" data-range="18:00-22:00" role="option">
+                            <span class="dh-slot-name">Akşam</span>
+                            <span class="dh-slot-range">18:00-22:00</span>
+                        </button>
+                        <button type="button" class="dh-filter-item dh-slot-item" data-value="night" data-name="Gece" data-range="22:00-23:59" role="option">
+                            <span class="dh-slot-name">Gece</span>
+                            <span class="dh-slot-range">22:00-23:59</span>
+                        </button>
+                        <button type="button" class="dh-filter-item dh-slot-item" data-value="midnight" data-name="Gece yarısı" data-range="00:00-06:00" role="option">
+                            <span class="dh-slot-name">Gece yarısı</span>
+                            <span class="dh-slot-range">00:00-06:00</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="dh-field dh-status-date">
                     <label for="status-date">Tarih</label>
-                    <input type="text" id="status-date" name="date" placeholder="Tarih seçin">
+                    <input type="text" id="status-date" placeholder="Tarih seçin" autocomplete="off" readonly>
                 </div>
-                <button type="submit" class="dh-btn-primary"><i class="ti ti-arrow-right" aria-hidden="true"></i></button>
+
+                <button type="submit" class="dh-btn-primary dh-status-submit" aria-label="Uçuş durumunu sorgula">
+                    <i class="ti ti-arrow-right" aria-hidden="true"></i>
+                </button>
+
+                <div class="dh-form-error" id="status-error" hidden>
+                    <i class="ti ti-alert-circle" aria-hidden="true"></i>
+                    <span id="status-error-text"></span>
+                </div>
             </form>
         </div>
-        <div id="status-result"></div>
     </section>
 </main>
 
@@ -207,5 +289,7 @@
 <script src="{{ asset('js/flight-status.js') }}"></script>
 <script src="/js/pax-dropdown-fit.js"></script>
 <script src="{{ asset('js/help-modal.js') }}"></script>
+<script src="{{ asset('js/airport-picker.js') }}"></script>
+<script src="{{ asset('js/mega-menu.js') }}"></script>
 </body>
 </html>
