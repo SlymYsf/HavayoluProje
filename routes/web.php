@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 /* ===== SAYFALAR ===== */
 
 Route::get('/', [FlightSearchController::class, 'index']);
-
+Route::get('/ucus-durumu', fn () => view('flights.status'))->name('flights.status');
 Route::get('/ucus-sonuclari', fn () => view('flights.results'))->name('flights.results');
 Route::get('/check-in', fn () => view('flights.checkin'))->name('flights.checkin');
 Route::get('/bilet-yonetimi', fn () => view('flights.manage'))->name('flights.manage');
@@ -120,4 +120,6 @@ if (app()->isLocal()) {
 
         return new \App\Mail\CheckInReminder($pnr, $leg, $url);
     });
+
+
 }
