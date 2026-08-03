@@ -1535,3 +1535,43 @@
     min-width: 0;
     color: var(--dh-ink);
 }
+
+/* ===== YOLCU PANELİ SIKILAŞTIRMA — 3 Ağustos 2026 ===== */
+/* Panel 4 yolcu tipi + kabin seçimi + altbilgi ile ekranı aşıyordu;
+   satır yükseklikleri ve boşluklar daraltıldı. */
+
+.dh-passenger-dropdown .dh-pax-row {
+    padding: 10px 0;
+}
+
+.dh-passenger-dropdown .dh-pax-info strong {
+    font-size: 14px;
+}
+
+.dh-passenger-dropdown .dh-pax-info span {
+    font-size: 12px;
+}
+
+.dh-passenger-dropdown .dh-pax-btn {
+    width: 30px;
+    height: 30px;
+}
+
+.dh-passenger-dropdown .dh-dropdown-header {
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.dh-passenger-dropdown .dh-cabin-tabs {
+    margin-bottom: 8px;
+}
+
+.dh-passenger-dropdown .dh-cabin-tab {
+    padding: 10px 12px;
+    font-size: 13px;
+}
+
+.dh-passenger-dropdown .dh-pax-footer {
+    padding-top: 12px;
+}

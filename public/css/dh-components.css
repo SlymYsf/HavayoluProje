@@ -580,3 +580,1022 @@
     font-weight: 600;
     color: var(--dh-red-dark);
 }
+
+/* ===== SİTE İÇİ ARAMA — 3 Ağustos 2026 ===== */
+
+.dh-search-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: rgba(22, 20, 20, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+}
+
+.dh-search-overlay[hidden] {
+    display: none;
+}
+
+/* Katmanın yüksekliği ekranla sınırlı; başlık ve arama kutusu sabit kalır,
+   yalnızca sonuç listesi kaydırılır. */
+.dh-search-modal {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 760px;
+    max-height: calc(100vh - 80px);
+    background: #FFFFFF;
+    border-radius: 14px;
+    padding: 44px 48px 36px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+}
+
+.dh-search-results {
+    margin-top: 20px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+.dh-search-close {
+    position: absolute;
+    top: -16px;
+    right: -16px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: var(--dh-ink);
+    color: #FFFFFF;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dh-search-heading {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--dh-ink);
+    text-align: center;
+    margin-bottom: 24px;
+    flex: none;
+}
+
+.dh-search-box {
+    position: relative;
+    flex: none;
+}
+
+.dh-search-box input {
+    width: 100%;
+    height: 60px;
+    padding: 0 56px 0 20px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 16px;
+    color: var(--dh-ink);
+    background: var(--dh-cloud);
+    border: 0.5px solid var(--dh-border);
+    border-radius: 8px;
+}
+
+.dh-search-box input::placeholder {
+    color: var(--dh-placeholder);
+}
+
+.dh-search-box input:focus {
+    outline: none;
+    border-color: var(--dh-red);
+}
+
+.dh-search-box > i {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: var(--dh-muted);
+    pointer-events: none;
+}
+
+.dh-search-results {
+    margin-top: 20px;
+}
+
+.dh-search-hit {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    text-align: left;
+    text-decoration: none;
+    background: none;
+    border: none;
+    border-top: 0.5px solid var(--dh-border);
+    padding: 14px 4px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+}
+
+.dh-search-hit:hover {
+    background: var(--dh-cloud);
+}
+
+.dh-search-hit > i {
+    flex: none;
+    font-size: 18px;
+    color: var(--dh-red);
+    margin-top: 2px;
+}
+
+.dh-search-hit-title {
+    display: block;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--dh-ink);
+}
+
+.dh-search-hit-body {
+    display: block;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--dh-muted);
+    margin-top: 4px;
+}
+
+.dh-search-results mark {
+    background: var(--dh-red-tint);
+    color: var(--dh-red-dark);
+    font-weight: 500;
+    border-radius: 3px;
+    padding: 0 2px;
+}
+
+.dh-search-answer {
+    border-left: 2px solid var(--dh-red-tint-strong);
+    border-radius: 0;
+    background: var(--dh-cloud);
+    padding: 16px 20px;
+    margin: 0 4px 8px 34px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--dh-ink);
+}
+
+.dh-search-answer p {
+    margin-bottom: 10px;
+}
+
+.dh-search-answer ul {
+    margin: 0 0 10px 18px;
+}
+
+.dh-search-empty {
+    font-size: 14px;
+    color: var(--dh-muted);
+    padding: 20px 4px;
+    text-align: center;
+}
+
+@media (max-width: 700px) {
+    .dh-search-overlay {
+        padding: 60px 16px 24px;
+    }
+
+    .dh-search-modal {
+        padding: 32px 24px 24px;
+    }
+
+    .dh-search-heading {
+        font-size: 20px;
+    }
+}
+
+/* ===== DİL VE BÖLGE SEÇİMİ — 3 Ağustos 2026 ===== */
+
+.dh-locale {
+    position: relative;
+    display: inline-flex;
+}
+
+.dh-locale-trigger {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.dh-locale-trigger:hover,
+.dh-locale-trigger[aria-expanded="true"] {
+    color: #FFFFFF;
+}
+
+.dh-locale-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 400;
+    width: 300px;
+    background: #FFFFFF;
+    border: 0.5px solid var(--dh-border);
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+    text-align: left;
+}
+
+/* hidden özniteliği tek başına yetmiyor; panele verilen konum ve görünüm
+   kuralları display: none'ı ezebiliyor. */
+.dh-locale-panel[hidden] {
+    display: none;
+}
+
+.dh-locale-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--dh-ink);
+    margin-bottom: 8px;
+}
+
+.dh-locale-remember {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--dh-ink);
+    margin-bottom: 16px;
+    cursor: pointer;
+}
+
+.dh-locale-remember input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--dh-red);
+    cursor: pointer;
+}
+
+.dh-locale-apply {
+    width: 100%;
+    justify-content: center;
+}
+
+/* --- Bayraklı aranabilir seçici --- */
+
+.dh-picker {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.dh-picker-trigger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 44px;
+    padding: 0 12px;
+    background: #FFFFFF;
+    border: 0.5px solid var(--dh-border);
+    border-radius: 6px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    color: var(--dh-ink);
+    cursor: pointer;
+}
+
+.dh-picker-trigger:hover,
+.dh-picker-trigger[aria-expanded="true"] {
+    border-color: var(--dh-red);
+}
+
+.dh-picker-trigger .dh-picker-text {
+    flex: 1;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dh-picker-trigger > i:last-child {
+    flex: none;
+    font-size: 16px;
+    color: var(--dh-muted);
+}
+
+.dh-picker-flag {
+    flex: none;
+    width: 24px;
+    height: 16px;
+    object-fit: cover;
+    border-radius: 2px;
+}
+
+.dh-picker-icon {
+    flex: none;
+    font-size: 18px;
+    color: var(--dh-muted);
+}
+
+.dh-picker-panel {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background: #FFFFFF;
+    border: 0.5px solid var(--dh-border);
+    border-radius: 8px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+}
+
+.dh-picker-panel[hidden] {
+    display: none;
+}
+
+.dh-picker-search {
+    padding: 8px;
+    border-bottom: 0.5px solid var(--dh-border);
+}
+
+.dh-picker-search input {
+    width: 100%;
+    height: 36px;
+    padding: 0 10px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    color: var(--dh-ink);
+    background: var(--dh-cloud);
+    border: 0.5px solid var(--dh-border);
+    border-radius: 5px;
+}
+
+.dh-picker-search input:focus {
+    outline: none;
+    border-color: var(--dh-red);
+}
+
+/* 213 ülke listeleniyor; yükseklik panelin taşmaması için sınırlı. */
+.dh-picker-list {
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.dh-picker-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 12px;
+    background: none;
+    border: none;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    color: var(--dh-ink);
+    text-align: left;
+    cursor: pointer;
+}
+
+.dh-picker-item[hidden] {
+    display: none;
+}
+
+.dh-picker-item img {
+    flex: none;
+    width: 24px;
+    height: 16px;
+    object-fit: cover;
+    border-radius: 2px;
+}
+
+.dh-picker-item > i {
+    flex: none;
+    font-size: 18px;
+    color: var(--dh-muted);
+}
+
+.dh-picker-item:hover {
+    background: var(--dh-cloud);
+}
+
+.dh-picker-item[aria-selected="true"] {
+    background: var(--dh-red-tint);
+    color: var(--dh-red-dark);
+    font-weight: 500;
+}
+
+/* ===== GİRİŞ VE ÜYELİK KATMANI — 3 Ağustos 2026 ===== */
+
+.dh-auth-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 600;
+    background: rgba(22, 20, 20, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    overflow-y: auto;
+}
+
+.dh-auth-overlay[hidden] {
+    display: none;
+}
+
+.dh-auth-pane .dh-field {
+    margin-bottom: 14px;
+}
+
+.dh-auth-names .dh-field {
+    margin-bottom: 0;
+}
+
+.dh-auth-box {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    background: #FFFFFF;
+    border-radius: 14px;
+    padding: 40px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+}
+
+.dh-auth-close {
+    position: absolute;
+    top: -16px;
+    right: -16px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: var(--dh-ink);
+    color: #FFFFFF;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dh-auth-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+    align-items: start;
+}
+
+.dh-auth-heading {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--dh-ink);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.dh-auth-back {
+    text-align: center;
+    margin-top: 16px;
+}
+
+.dh-auth-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: var(--dh-red-tint);
+    border-left: 2px solid var(--dh-red);
+    border-radius: 0;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--dh-red-dark);
+}
+
+.dh-auth-notice[hidden] {
+    display: none;
+}
+
+
+.dh-auth-pane[hidden] {
+    display: none;
+}
+
+.dh-auth-names {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.dh-auth-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 4px 0 18px;
+}
+
+.dh-auth-remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--dh-ink);
+    cursor: pointer;
+}
+
+.dh-auth-remember input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--dh-red);
+    cursor: pointer;
+}
+
+.dh-auth-terms {
+    align-items: flex-start;
+    line-height: 1.6;
+    margin: 4px 0 18px;
+}
+
+.dh-auth-link {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--dh-red);
+    cursor: pointer;
+}
+
+.dh-auth-link:hover {
+    text-decoration: underline;
+}
+
+.dh-auth-submit {
+    width: 100%;
+    justify-content: center;
+}
+
+/* --- Sağ taraf: üyelik tanıtımı --- */
+
+.dh-auth-promo {
+    background: var(--dh-cloud);
+    border: 0.5px solid var(--dh-border);
+    border-radius: 12px;
+    padding: 32px 28px;
+}
+
+.dh-auth-promo-icon {
+    font-size: 32px;
+    color: var(--dh-red);
+    margin-bottom: 16px;
+    display: block;
+}
+
+.dh-auth-promo h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 19px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--dh-ink);
+    margin-bottom: 10px;
+}
+
+.dh-auth-promo p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--dh-muted);
+    margin-bottom: 20px;
+}
+
+.dh-auth-promo-list {
+    list-style: none;
+    margin-bottom: 24px;
+}
+
+.dh-auth-promo-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--dh-ink);
+    padding: 7px 0;
+}
+
+.dh-auth-promo-list i {
+    font-size: 16px;
+    color: var(--dh-red);
+}
+
+.dh-auth-promo-btn {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    width: 100%;
+    background: #FFFFFF;
+    border: 0.5px solid var(--dh-red);
+    border-radius: 8px;
+    padding: 14px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--dh-red);
+    cursor: pointer;
+}
+
+.dh-auth-promo-btn:hover {
+    background: var(--dh-red);
+    color: #FFFFFF;
+}
+
+/* --- Header butonu --- */
+
+.dh-login-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-align: left;
+    line-height: 1.25;
+}
+
+.dh-login-btn i {
+    font-size: 18px;
+}
+
+.dh-login-btn .dh-login-sub {
+    display: block;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+@media (max-width: 800px) {
+    .dh-auth-box {
+        padding: 28px 20px;
+    }
+
+    .dh-auth-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .dh-auth-promo {
+        padding: 24px 20px;
+    }
+}
+
+/* ===== ÜYELİK SAYFASI — 3 Ağustos 2026 ===== */
+
+.dh-register {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.dh-register-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--dh-ink);
+    margin-bottom: 8px;
+}
+
+.dh-register-lead {
+    font-size: 15px;
+    color: var(--dh-muted);
+    margin-bottom: 24px;
+}
+
+.dh-register-section {
+    background: #FFFFFF;
+    border: 0.5px solid var(--dh-border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+}
+
+.dh-register-section h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--dh-ink);
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+    border-bottom: 0.5px solid var(--dh-border);
+}
+
+.dh-register-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.dh-register-grid:last-child {
+    margin-bottom: 0;
+}
+
+.dh-register-hint {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--dh-muted);
+    margin-top: 4px;
+}
+
+.dh-register-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--dh-ink);
+    cursor: pointer;
+    padding: 6px 0;
+}
+
+.dh-register-check input {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: var(--dh-red);
+    cursor: pointer;
+}
+
+.dh-register-submit {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.dh-register-login {
+    text-align: center;
+    font-size: 14px;
+    color: var(--dh-muted);
+}
+
+@media (max-width: 700px) {
+    .dh-register-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== BİLDİRİM ÇANI — 3 Ağustos 2026 ===== */
+
+.dh-bell {
+    position: relative;
+    display: inline-flex;
+    margin-left: 12px;
+}
+
+.dh-bell-trigger {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    border-radius: 50%;
+    color: #FFFFFF;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.dh-bell-trigger:hover,
+.dh-bell-trigger[aria-expanded="true"] {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.dh-bell-badge {
+    position: absolute;
+    top: 2px;
+    right: 0;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: var(--dh-red);
+    color: #FFFFFF;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 18px;
+    text-align: center;
+}
+
+.dh-bell-badge[hidden] {
+    display: none;
+}
+
+.dh-bell-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 400;
+    width: 440px;
+    max-width: calc(100vw - 32px);
+    background: #FFFFFF;
+    border: 0.5px solid var(--dh-border);
+    border-radius: 12px;
+    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.24);
+    overflow: hidden;
+}
+
+.dh-bell-panel[hidden] {
+    display: none;
+}
+
+.dh-bell-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 14px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 19px;
+    font-weight: 500;
+    color: var(--dh-ink);
+}
+
+.dh-bell-close {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 20px;
+    color: var(--dh-muted);
+    cursor: pointer;
+}
+
+.dh-bell-close:hover {
+    color: var(--dh-ink);
+}
+
+.dh-bell-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 0 20px;
+    border-bottom: 0.5px solid var(--dh-border);
+}
+
+.dh-bell-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    padding: 10px 12px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    color: var(--dh-muted);
+    cursor: pointer;
+}
+
+.dh-bell-tab-active {
+    color: var(--dh-ink);
+    font-weight: 500;
+    border-bottom-color: var(--dh-red);
+}
+
+.dh-bell-tab-count {
+    background: var(--dh-cloud);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 12px;
+    color: var(--dh-muted);
+}
+
+.dh-bell-tab-active .dh-bell-tab-count {
+    background: var(--dh-red-tint);
+    color: var(--dh-red-dark);
+}
+
+/* Duyuru sayısı 20'ye kadar çıkabiliyor; liste kendi içinde kaydırılıyor. */
+.dh-bell-list {
+    max-height: 440px;
+    overflow-y: auto;
+}
+
+.dh-bell-item {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 32px 16px 20px;
+    border-bottom: 0.5px solid var(--dh-border);
+    cursor: pointer;
+}
+
+.dh-bell-item:last-child {
+    border-bottom: none;
+}
+
+/* Okunmamış bildirimler hafif renkli zeminle ayrışıyor. */
+.dh-bell-item-unread {
+    background: var(--dh-red-tint);
+}
+
+.dh-bell-item:hover {
+    background: var(--dh-cloud);
+}
+
+.dh-bell-item-logo {
+    flex: none;
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    background: #FFFFFF;
+    border: 0.5px solid var(--dh-border);
+    border-radius: 50%;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.dh-bell-item-main {
+    min-width: 0;
+}
+
+.dh-bell-item-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--dh-ink);
+    margin-bottom: 4px;
+}
+
+.dh-bell-item-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--dh-placeholder);
+    margin-bottom: 8px;
+}
+
+.dh-bell-item-body {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--dh-muted);
+}
+
+.dh-bell-dot {
+    position: absolute;
+    top: 20px;
+    right: 16px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--dh-red);
+}
+
+.dh-bell-empty {
+    padding: 32px 20px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--dh-muted);
+}
+
+.dh-bell-foot {
+    padding: 12px 20px;
+    border-top: 0.5px solid var(--dh-border);
+}
+
+.dh-bell-readall {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--dh-red);
+    cursor: pointer;
+}
+
+.dh-bell-readall:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 700px) {
+    .dh-bell-panel {
+        width: 340px;
+    }
+
+    .dh-bell-item {
+        padding: 14px 28px 14px 16px;
+    }
+}
