@@ -11,41 +11,41 @@
     $menu = [
         [
             'id' => 'bilet',
-            'label' => 'Bilet al ve yönet',
+            'label' => __('Bilet al ve yönet'),
             'columns' => [
                 [
-                    'title' => 'Bilet al',
+                    'title' => __('Bilet al'),
                     'links' => [
-                        ['text' => 'Uçak bileti', 'href' => '/?sekme=ucak'],
+                        ['text' => __('Uçak bileti'), 'href' => '/?sekme=ucak'],
                     ],
                 ],
                 [
-                    'title' => 'Bilet yönetimi',
+                    'title' => __('Bilet yönetimi'),
                     'links' => [
-                        ['text' => 'Bilet yönetimi', 'href' => '/?sekme=yonetim'],
-                        ['text' => 'Check-in',       'href' => '/?sekme=checkin'],
-                        ['text' => 'Uçuş durumu',    'href' => '/?sekme=durum'],
-                        ['text' => 'Bilet iptali',   'href' => '/?sekme=yonetim'],
+                        ['text' => __('Bilet yönetimi'), 'href' => '/?sekme=yonetim'],
+                        ['text' => __('Check-in'),       'href' => '/?sekme=checkin'],
+                        ['text' => __('Uçuş durumu'),    'href' => '/?sekme=durum'],
+                        ['text' => __('Bilet iptali'),   'href' => '/?sekme=yonetim'],
                     ],
                 ],
                 [
-                    'title' => 'Ek hizmetler',
+                    'title' => __('Ek hizmetler'),
                     'links' => [
-                        ['text' => 'Koltuk seçimi',            'href' => '#'],
-                        ['text' => 'Ekstra bagaj',             'href' => '#'],
-                        ['text' => 'Business upgrade',         'href' => '#'],
-                        ['text' => 'Evcil hayvanlarla seyahat','href' => '#'],
-                        ['text' => 'Spor ekipmanları taşıma',  'href' => '#'],
+                        ['text' => __('Koltuk seçimi'),             'href' => '#'],
+                        ['text' => __('Ekstra bagaj'),              'href' => '#'],
+                        ['text' => __('Business upgrade'),          'href' => '#'],
+                        ['text' => __('Evcil hayvanlarla seyahat'), 'href' => '#'],
+                        ['text' => __('Spor ekipmanları taşıma'),   'href' => '#'],
                     ],
                 ],
             ],
         ],
         [
             'id' => 'deneyim',
-            'label' => 'Seyahat deneyimi',
+            'label' => __('Seyahat deneyimi'),
             'columns' => [
                 [
-                    'title' => 'Kabin sınıfı',
+                    'title' => __('Kabin sınıfı'),
                     'links' => [
                         ['text' => 'Economy',         'href' => '#'],
                         ['text' => 'Premium Economy', 'href' => '#'],
@@ -53,49 +53,49 @@
                     ],
                 ],
                 [
-                    'title' => 'Uçuş deneyimi',
+                    'title' => __('Uçuş deneyimi'),
                     'links' => [
-                        ['text' => 'Filo',           'href' => '#'],
-                        ['text' => 'Uçak içi ikram', 'href' => '#'],
+                        ['text' => __('Filo'),           'href' => '#'],
+                        ['text' => __('Uçak içi ikram'), 'href' => '#'],
                     ],
                 ],
             ],
         ],
         [
             'id' => 'firsatlar',
-            'label' => 'Fırsatlar ve uçuş noktaları',
+            'label' => __('Fırsatlar ve uçuş noktaları'),
             'columns' => [
                 [
-                    'title' => 'Fırsatlar',
+                    'title' => __('Fırsatlar'),
                     'links' => [
-                        ['text' => 'Kampanyalar',     'href' => '#'],
-                        ['text' => 'Uçuş fırsatları', 'href' => '#'],
+                        ['text' => __('Kampanyalar'),     'href' => '#'],
+                        ['text' => __('Uçuş fırsatları'), 'href' => '#'],
                     ],
                 ],
                 [
-                    'title' => 'Destinasyonlar',
+                    'title' => __('Destinasyonlar'),
                     'links' => [
-                        ['text' => 'Uçuş noktalarımız', 'href' => '#'],
-                        ['text' => 'Japonya',           'href' => '#'],
-                        ['text' => 'Çin',               'href' => '#'],
-                        ['text' => 'Rusya',             'href' => '#'],
-                        ['text' => 'ABD',               'href' => '#'],
-                        ['text' => 'İngiltere',         'href' => '#'],
-                        ['text' => 'Avustralya',        'href' => '#'],
+                        ['text' => __('Uçuş noktalarımız'), 'href' => '#'],
+                        ['text' => __('Japonya'),           'href' => '#'],
+                        ['text' => __('Çin'),               'href' => '#'],
+                        ['text' => __('Rusya'),             'href' => '#'],
+                        ['text' => __('ABD'),               'href' => '#'],
+                        ['text' => __('İngiltere'),         'href' => '#'],
+                        ['text' => __('Avustralya'),        'href' => '#'],
                     ],
                 ],
             ],
         ],
         [
             'id' => 'yardim',
-            'label' => 'Yardım',
+            'label' => __('Yardım'),
             'columns' => [
                 [
-                    'title' => 'Sıkça sorulan sorular',
+                    'title' => __('Sıkça sorulan sorular'),
                     'links' => [
-                        ['text' => 'PNR kodu nasıl bulunur?',            'help' => 'pnr'],
-                        ['text' => 'Check-in ne zaman açılır?',          'help' => 'checkin-time'],
-                        ['text' => 'Rezervasyonumu nasıl iptal ederim?', 'help' => 'cancel'],
+                        ['text' => __('PNR kodu nasıl bulunur?'),            'help' => 'pnr'],
+                        ['text' => __('Check-in ne zaman açılır?'),          'help' => 'checkin-time'],
+                        ['text' => __('Rezervasyonumu nasıl iptal ederim?'), 'help' => 'cancel'],
                     ],
                 ],
             ],
@@ -105,17 +105,19 @@
 
 <header class="dh-header">
     <div class="dh-header-utility">
-        <a href="#"><i class="ti ti-search" aria-hidden="true"></i> Ara</a>
-        <span>TR</span>
+        <button type="button" class="dh-utility-btn" data-open-search>
+            <i class="ti ti-search" aria-hidden="true"></i> {{ __('Ara') }}
+        </button>
+        @include('partials.locale-panel')
     </div>
 
     <div class="dh-header-main">
         <a href="/" class="dh-logo">
-            <img src="{{ asset('images/logo.png') }}" alt="Devlet Havayolları logosu">
+            <img src="{{ asset('images/logo.png') }}" alt="{{ __('Devlet Havayolları logosu') }}">
             <span>Devlet Havayolları</span>
         </a>
 
-        <nav class="dh-main-nav" aria-label="Ana menü">
+        <nav class="dh-main-nav" aria-label="{{ __('Ana menü') }}">
             @foreach ($menu as $index => $item)
                 @if ($index > 0)
                     <span class="dh-nav-sep" aria-hidden="true">|</span>
@@ -135,7 +137,59 @@
             @endforeach
         </nav>
 
-        <button class="dh-login-btn">Giriş yap</button>
+
+
+        <button type="button" class="dh-login-btn" data-open-auth aria-label="{{ __('Giriş yap veya üye ol') }}">
+            <i class="ti ti-user-circle" aria-hidden="true"></i>
+            <span>
+                {{ __('Giriş yap') }}
+                <span class="dh-login-sub">{{ __('veya üye ol') }}</span>
+            </span>
+        </button>
+
+        <div class="dh-bell" id="announcement-bell">
+            <button type="button" class="dh-bell-trigger" id="announcement-trigger"
+                    aria-haspopup="dialog" aria-expanded="false"
+                    aria-label="{{ __('Bildirimler') }}">
+                <i class="ti ti-bell" aria-hidden="true"></i>
+                <span class="dh-bell-badge" id="announcement-count" hidden>0</span>
+            </button>
+
+            <div class="dh-bell-panel" id="announcement-panel" hidden>
+                <div class="dh-bell-head">
+                    <span>{{ __('Bildirimler') }}</span>
+                    <button type="button" class="dh-bell-close" id="announcement-close"
+                            aria-label="{{ __('Kapat') }}">
+                        <i class="ti ti-x" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <div class="dh-bell-tabs" id="announcement-tabs" role="tablist">
+                    <button type="button" class="dh-bell-tab dh-bell-tab-active" data-filter="all" role="tab">
+                        {{ __('Tümü') }} <span class="dh-bell-tab-count">0</span>
+                    </button>
+                    <button type="button" class="dh-bell-tab" data-filter="flight" role="tab">
+                        {{ __('Uçuş') }} <span class="dh-bell-tab-count">0</span>
+                    </button>
+                    <button type="button" class="dh-bell-tab" data-filter="general" role="tab">
+                        {{ __('Genel') }} <span class="dh-bell-tab-count">0</span>
+                    </button>
+                </div>
+
+                <div class="dh-bell-list" id="announcement-list"
+                     data-empty-text="{{ __('Şu anda görüntülenecek bildirim bulunmuyor.') }}"
+                     data-error-text="{{ __('Bildirimler yüklenemedi.') }}"
+                     data-loading-text="{{ __('Yükleniyor...') }}"
+                     data-logo="{{ asset('images/logo.png') }}">
+                </div>
+
+                <div class="dh-bell-foot">
+                    <button type="button" class="dh-bell-readall" id="announcement-readall">
+                        <i class="ti ti-check" aria-hidden="true"></i> {{ __('Tümünü okundu olarak işaretle') }}
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="dh-mega-wrap">
