@@ -22,6 +22,15 @@ return Application::configure(basePath: dirname(__DIR__))
 
     })
 
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->web(append: [
+            \App\Http\Middleware\SetLocale::class,
+        ]);
+
+        $middleware->alias([
+            'reservation.timeout' => \App\Http\Middleware\ReservationTimeout::class,
+        ]);
+    })
 
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

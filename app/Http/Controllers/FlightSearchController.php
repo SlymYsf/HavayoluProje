@@ -6,6 +6,7 @@ use App\Models\Airport;
 use App\Models\Route;
 use App\Services\FlightSearchService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class FlightSearchController extends Controller
 {
@@ -20,8 +21,9 @@ class FlightSearchController extends Controller
     /** Arama formunu doldurmak için havalimanı listesi (yarın frontend bunu kullanacak). */
     public function airports()
     {
-        $airports = Airport::orderBy('city')->get(['id', 'iata_code', 'name', 'city', 'country', 'is_hub']);
-        return response()->json($airports);
+        $airports = Airport::get(['id', 'iata_code', 'name', 'city', 'country', 'is_hub']);
+
+        return response()->json($this->localizeAirports($airports));
     }
 
     /** IST'ten seçilen havalimanına, opsiyonel tarih filtresiyle uçuş arar. */
@@ -42,7 +44,7 @@ class FlightSearchController extends Controller
             ->first();
 
         if (! $route) {
-            return response()->json(['error' => 'Bu iki nokta arasında tanımlı rota yok.'], 404);
+            return response()->json(['error' => __('Bu iki nokta arasında tanımlı rota yok.')], 404);
         }
 
         $date = isset($validated['date']) ? \Carbon\Carbon::parse($validated['date']) : null;
@@ -64,9 +66,41 @@ class FlightSearchController extends Controller
             ->pluck('destination_airport_id');
 
         $airports = Airport::whereIn('id', $destinationIds)
-            ->orderBy('city')
             ->get(['id', 'iata_code', 'name', 'city', 'country', 'is_hub']);
 
-        return response()->json($airports);
+        return response()->json($this->localizeAirports($airports));
+    }
+
+    /**
+     * Havalimanı adlarını arayüz diline çevirir ve o dile göre sıralar.
+     *
+     * Adlar veritabanında yalnızca Türkçe tutuluyor. Her dil için ayrı sütun
+     * açmak yerine çeviri katmanından geçiriliyor: karşılığı bulunamayan ad
+     * Türkçe kalır, hata oluşmaz.
+     *
+     * Sıralama SQL'de değil burada yapılıyor; veritabanı Türkçe adlara göre
+     * sıralar, oysa kullanıcının gördüğü çevrilmiş addır.
+     */
+    private function localizeAirports(Collection $airports): Collection
+    {
+        $locale = app()->getLocale();
+
+        $airports->transform(function (Airport $airport) {
+            $airport->name = __($airport->name);
+            $airport->city = __($airport->city);
+            $airport->country = __($airport->country);
+
+            return $airport;
+        });
+
+        $collator = class_exists(\Collator::class) ? new \Collator($locale) : null;
+
+        return $airports
+            ->sort(function (Airport $a, Airport $b) use ($collator) {
+                return $collator
+                    ? $collator->compare($a->city, $b->city)
+                    : strcmp($a->city, $b->city);
+            })
+            ->values();
     }
 }
