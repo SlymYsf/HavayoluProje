@@ -8,10 +8,13 @@ use App\Http\Controllers\FlightStatusController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TicketManagementController;
+use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\LocaleController;
 use Illuminate\Support\Facades\Route;
 
 /* ===== SAYFALAR ===== */
 
+Route::get('/uye-ol', fn () => view('auth.register'))->name('auth.register');
 Route::get('/', [FlightSearchController::class, 'index']);
 Route::get('/ucus-durumu', fn () => view('flights.status'))->name('flights.status');
 Route::get('/ucus-sonuclari', fn () => view('flights.results'))->name('flights.results');
@@ -25,11 +28,12 @@ Route::get('/api/flights/search', [FlightSearchController::class, 'search']);
 Route::get('/api/flights/status', [FlightStatusController::class, 'show']);
 Route::get('/api/fares/calendar', [FareCalendarController::class, 'strip']);
 Route::get('/api/country-codes', [CountryCodeController::class, 'index']);
-
+Route::get('/api/announcements', [AnnouncementController::class, 'index']);
 Route::post('/api/tickets', [TicketController::class, 'store']);
 Route::post('/api/checkin', [CheckInController::class, 'store']);
 Route::get('/api/tickets/manage', [TicketManagementController::class, 'show']);
 Route::post('/api/tickets/cancel', [TicketManagementController::class, 'cancel']);
+Route::post('/dil', [LocaleController::class, 'update'])->name('locale.update');
 
 /* ===== REZERVASYON AKIŞI ===== */
 

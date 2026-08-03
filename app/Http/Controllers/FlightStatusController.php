@@ -11,25 +11,27 @@ use Illuminate\Validation\Rule;
 
 class FlightStatusController extends Controller
 {
-    public function __construct(private FlightService $flightService) {}
+    public function __construct(private FlightService $flightService)
+    {
+    }
 
     public function show(Request $request)
     {
         $validated = $request->validate([
-            'filter'        => 'required|in:number,departure,arrival,route',
-            'date'          => 'required|date',
+            'filter' => 'required|in:number,departure,arrival,route',
+            'date' => 'required|date',
             'flight_number' => 'required_if:filter,number|nullable|string|max:10',
-            'airport'       => 'required_if:filter,departure,arrival|nullable|string',
-            'origin'        => 'required_if:filter,route|nullable|string',
-            'destination'   => 'required_if:filter,route|nullable|string',
-            'time_slot'     => ['nullable', Rule::in(FlightService::timeSlotKeys())],
+            'airport' => 'required_if:filter,departure,arrival|nullable|string',
+            'origin' => 'required_if:filter,route|nullable|string',
+            'destination' => 'required_if:filter,route|nullable|string',
+            'time_slot' => ['nullable', Rule::in(FlightService::timeSlotKeys())],
         ], [
-            'date.required'             => 'Tarih zorunludur.',
-            'date.date'                 => 'Geçerli bir tarih girin.',
+            'date.required' => 'Tarih zorunludur.',
+            'date.date' => 'Geçerli bir tarih girin.',
             'flight_number.required_if' => 'Uçuş numarası zorunludur.',
-            'airport.required_if'       => 'Havalimanı seçilmedi.',
-            'origin.required_if'        => 'Kalkış noktası seçilmedi.',
-            'destination.required_if'   => 'Varış noktası seçilmedi.',
+            'airport.required_if' => 'Havalimanı seçilmedi.',
+            'origin.required_if' => 'Kalkış noktası seçilmedi.',
+            'destination.required_if' => 'Varış noktası seçilmedi.',
         ]);
 
         $date = $validated['date'];
@@ -66,10 +68,10 @@ class FlightStatusController extends Controller
         }
 
         return response()->json([
-            'filter'  => $validated['filter'],
-            'date'    => $date,
-            'count'   => $flights->count(),
-            'flights' => $flights->map(fn (Flight $f) => $this->present($f))->values(),
+            'filter' => $validated['filter'],
+            'date' => $date,
+            'count' => $flights->count(),
+            'flights' => $flights->map(fn(Flight $f) => $this->present($f))->values(),
         ]);
     }
 
@@ -84,7 +86,7 @@ class FlightStatusController extends Controller
     private function airportIds(string $value): array
     {
         $ids = collect(explode(',', $value))
-            ->map(fn ($id) => (int) trim($id))
+            ->map(fn($id) => (int)trim($id))
             ->filter()
             ->unique()
             ->values();
@@ -103,7 +105,7 @@ class FlightStatusController extends Controller
     /** Uçuş numarası araması tek sonuç döner; diğer filtrelerle aynı yapıya çeviriyoruz. */
     private function singleOrEmpty(?Flight $flight): Collection
     {
-        if (! $flight) {
+        if (!$flight) {
             return collect();
         }
 
@@ -115,29 +117,39 @@ class FlightStatusController extends Controller
     /**
      * Ham modeli döndürmüyoruz: iç kimlikler ve zaman damgaları istemcinin
      * işine yaramıyor, üstelik şema değişince arayüz de kırılıyordu.
+     *
+     * Rötarlı uçuşlarda planlanan ve tahmini saatler ayrı ayrı gönderiliyor;
+     * yolcunun elindeki biletteki saat planlanan saat olduğu için ikisinin
+     * de görünmesi gerekiyor.
      */
     private function present(Flight $flight): array
     {
         $route = $flight->route;
 
         return [
-            'flight_number'  => $flight->flight_number,
-            'status'         => $flight->status,
+            'flight_number' => $flight->flight_number,
+            'status' => $flight->status,
             'departure_time' => $flight->departure_time->toIso8601String(),
-            'arrival_time'   => $flight->arrival_time->toIso8601String(),
-            'duration_min'   => $flight->departure_time->diffInMinutes($flight->arrival_time),
-            'aircraft'       => $flight->aircraft->model,
-            'origin'         => [
+            'arrival_time' => $flight->arrival_time->toIso8601String(),
+            'duration_min' => $flight->departure_time->diffInMinutes($flight->arrival_time),
+            'aircraft' => $flight->aircraft->model,
+            'delay' => $flight->isDelayed() ? [
+                'minutes' => $flight->delay_minutes,
+                'reason' => $flight->delay_reason,
+                'estimated_departure' => $flight->estimatedDepartureTime()->toIso8601String(),
+                'estimated_arrival' => $flight->estimatedArrivalTime()->toIso8601String(),
+            ] : null,
+            'origin' => [
                 'iata_code' => $route->originAirport->iata_code,
-                'name'      => $route->originAirport->name,
-                'city'      => $route->originAirport->city,
-                'country'   => $route->originAirport->country,
+                'name' => $route->originAirport->name,
+                'city' => $route->originAirport->city,
+                'country' => $route->originAirport->country,
             ],
-            'destination'    => [
+            'destination' => [
                 'iata_code' => $route->destinationAirport->iata_code,
-                'name'      => $route->destinationAirport->name,
-                'city'      => $route->destinationAirport->city,
-                'country'   => $route->destinationAirport->country,
+                'name' => $route->destinationAirport->name,
+                'city' => $route->destinationAirport->city,
+                'country' => $route->destinationAirport->country,
             ],
         ];
     }

@@ -16,6 +16,11 @@ document.addEventListener('DOMContentLoaded', function () {
     var destinationItems = null;
     var activeField = null;
 
+    /* Metinler ve sıralama dili js-translations.blade.php'den geliyor;
+       sabit 'tr' kullanılırsa İngilizce'de sıralama ve harf dönüşümü bozulur. */
+    var t = window.dhT || function (key) { return key; };
+    var locale = window.dhLocale || 'tr';
+
     var fields = {
         origin: {
             input: document.getElementById('origin-search'),
@@ -60,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
             rehydratePrefilledFields();
         })
         .catch(function () {
-            resultsBox.innerHTML = '<p class="dh-msg">Havalimanı listesi yüklenemedi.</p>';
+            resultsBox.innerHTML = '<p class="dh-msg">' + t('Havalimanı listesi yüklenemedi.') + '</p>';
         });
 
     function buildItemsFrom(airports) {
@@ -76,9 +81,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (group.length > 1) {
                 items.push({
                     type: 'city',
-                    label: city + ' (Tümü)',
+                    label: city + ' ' + t('(Tümü)'),
                     displayCity: city,
-                    displaySubtitle: 'Tüm havalimanları',
+                    displaySubtitle: t('Tüm havalimanları'),
                     name: city,
                     city: city,
                     country: group[0].country,
@@ -98,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             });
         });
-        items.sort(function (a, b) { return a.city.localeCompare(b.city, 'tr'); });
+        items.sort(function (a, b) { return a.city.localeCompare(b.city, locale); });
         return items;
     }
 
@@ -167,14 +172,14 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderDropdown(key, query) {
         var field = fields[key];
         field.dropdown.innerHTML = '';
-        query = query.trim().toLocaleLowerCase('tr');
+        query = query.trim().toLocaleLowerCase(locale);
 
         var pool = (key === 'destination' && destinationItems) ? destinationItems : searchItems;
 
         if (query === '') {
             var allBtn = document.createElement('div');
             allBtn.className = 'dh-autocomplete-all';
-            allBtn.innerHTML = '<i class="ti ti-world" aria-hidden="true"></i> Tüm uçuş noktalarını gör';
+            allBtn.innerHTML = '<i class="ti ti-world" aria-hidden="true"></i> ' + t('Tüm uçuş noktalarını gör');
             allBtn.addEventListener('click', openModal);
             field.dropdown.appendChild(allBtn);
             field.dropdown.hidden = false;
@@ -188,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!matches.length) {
             var empty = document.createElement('div');
             empty.className = 'dh-autocomplete-empty';
-            empty.textContent = 'Eşleşen uçuş noktası bulunamadı.';
+            empty.textContent = t('Eşleşen uçuş noktası bulunamadı.');
             field.dropdown.appendChild(empty);
             field.dropdown.hidden = false;
             return;
@@ -270,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function matchesWordStart(text, query) {
         if (!text) return false;
-        var words = text.toLocaleLowerCase('tr').split(/[\s\-\/]+/);
+        var words = text.toLocaleLowerCase(locale).split(/[\s\-\/]+/);
         for (var i = 0; i < words.length; i++) {
             if (words[i].indexOf(query) === 0) return true;
         }
@@ -285,14 +290,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 countries.push(item.country);
             }
         });
-        countries.sort(function (a, b) { return a.localeCompare(b, 'tr'); });
+        countries.sort(function (a, b) { return a.localeCompare(b, locale); });
 
         countryCount.textContent = countries.length;
         countryList.innerHTML = '';
 
         var currentLetter = '';
         countries.forEach(function (country) {
-            var letter = country.charAt(0).toLocaleUpperCase('tr');
+            var letter = country.charAt(0).toLocaleUpperCase(locale);
             if (letter !== currentLetter) {
                 currentLetter = letter;
                 var header = document.createElement('div');
@@ -312,7 +317,7 @@ document.addEventListener('DOMContentLoaded', function () {
             countryList.appendChild(item);
         });
 
-        airportList.innerHTML = '<div class="dh-modal-hint">Soldan bir ülke seçin.</div>';
+        airportList.innerHTML = '<div class="dh-modal-hint">' + t('Soldan bir ülke seçin.') + '</div>';
     }
 
     function showAirportsOf(country) {
@@ -322,7 +327,7 @@ document.addEventListener('DOMContentLoaded', function () {
         airportList.innerHTML = '';
 
         if (!list.length) {
-            airportList.innerHTML = '<div class="dh-modal-hint">Seçtiğiniz kalkış noktasından bu ülkeye uçuş bulunmuyor.</div>';
+            airportList.innerHTML = '<div class="dh-modal-hint">' + t('Seçtiğiniz kalkış noktasından bu ülkeye uçuş bulunmuyor.') + '</div>';
             return;
         }
 
@@ -398,27 +403,27 @@ document.addEventListener('DOMContentLoaded', function () {
             parseInt(document.getElementById('pax_student').value || 0);
 
         if (!originIds.length) {
-            showFormError('Lütfen kalkış noktasını seçin.', fields.origin.input.closest('.dh-route-half'));
+            showFormError(t('Lütfen kalkış noktasını seçin.'), fields.origin.input.closest('.dh-route-half'));
             return;
         }
 
         if (!destinationIds.length) {
-            showFormError('Lütfen varış noktasını seçin.', fields.destination.input.closest('.dh-route-half'));
+            showFormError(t('Lütfen varış noktasını seçin.'), fields.destination.input.closest('.dh-route-half'));
             return;
         }
 
         if (!date) {
-            showFormError('Lütfen gidiş tarihini seçin.', document.getElementById('departure-date').closest('.dh-date-field'));
+            showFormError(t('Lütfen gidiş tarihini seçin.'), document.getElementById('departure-date').closest('.dh-date-field'));
             return;
         }
 
         if (isRoundTrip && !returnDate) {
-            showFormError('Gidiş-dönüş araması için dönüş tarihini seçin.', document.getElementById('return-date-field'));
+            showFormError(t('Gidiş-dönüş araması için dönüş tarihini seçin.'), document.getElementById('return-date-field'));
             return;
         }
 
         if (totalPax < 1) {
-            showFormError('Lütfen en az bir yolcu seçin.', document.getElementById('passenger-toggle'));
+            showFormError(t('Lütfen en az bir yolcu seçin.'), document.getElementById('passenger-toggle'));
             return;
         }
 
@@ -511,7 +516,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const total = committedState.adult + committedState.child + committedState.infant + committedState.student;
         const cabinShort = committedState.cabin === 'economy' ? 'ECO' : 'BUS';
         summaryText.innerHTML =
-            '<span class="dh-pax-main-text">' + total + ' Yolcu</span>' +
+            '<span class="dh-pax-main-text">' + total + ' ' + t('Yolcu') + '</span>' +
             '<span class="dh-pax-sub-text">' + cabinShort + '</span>';
     }
 

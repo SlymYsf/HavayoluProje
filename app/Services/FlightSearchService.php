@@ -18,16 +18,25 @@ class FlightSearchService
      * Belirli bir rotada (opsiyonel tarih filtresiyle) satışa açık uçuşları,
      * her biri için hesaplanmış kabin sınıfı fiyatlarıyla birlikte döner.
      * Bu, Faz 5'te frontend'in üzerine kurulacağı servis katmanı temelidir.
+     *
+     * Rötarlı uçuşlar da listeleniyor: gerçek havayollarında rötar satışı
+     * durdurmaz, yalnızca kalkış saati kayar.
+     *
+     * Kalkışa 45 dakikadan az kalan uçuşlar listelenmiyor. Tarih filtresi tek
+     * başına yetmiyordu: bugünün tarihi seçildiğinde saati geçmiş uçuşlar da
+     * sonuçlara giriyordu.
      */
     public function searchFlights(Route $route, ?\DateTimeInterface $date = null, array $passengers = []): Collection
     {
-        $query = Flight::where('route_id', $route->id)->where('status', 'Planlandı');
+        $query = Flight::where('route_id', $route->id)
+            ->whereIn('status', Flight::SELLABLE_STATUSES)
+            ->where('departure_time', '>', now()->addMinutes(Flight::SALES_CUTOFF_MINUTES));
 
         if ($date !== null) {
             $query->whereDate('departure_time', $date);
         }
 
-        return $query->get()->map(fn (Flight $flight) => [
+        return $query->orderBy('departure_time')->get()->map(fn (Flight $flight) => [
             'flight' => $flight,
             'fares'  => $this->getPricedFares($flight, $passengers),
         ]);

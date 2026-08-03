@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uçuş Durumu — Devlet Havayolları</title>
+    <title>{{ __('Uçuş durumu') }} — Devlet Havayolları</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/dh-base.css') }}">
@@ -17,24 +17,27 @@
 <header class="dh-header dh-header-slim">
     <div class="dh-header-main">
         <a href="/" class="dh-logo">
-            <img src="{{ asset('images/logo.png') }}" alt="Devlet Havayolları logosu">
+            <img src="{{ asset('images/logo.png') }}" alt="{{ __('Devlet Havayolları logosu') }}">
             <span>Devlet Havayolları</span>
         </a>
-        <span class="dh-page-title">Uçuş durumu</span>
+        <span class="dh-page-title">{{ __('Uçuş durumu') }}</span>
     </div>
 </header>
 
 <div class="dh-page-back-bar">
     <a href="/" class="dh-page-back">
-        <i class="ti ti-arrow-left" aria-hidden="true"></i> Ana sayfaya dön
+        <i class="ti ti-arrow-left" aria-hidden="true"></i> {{ __('Ana sayfaya dön') }}
     </a>
 </div>
 
 <main class="dh-results-main">
     <div id="status-view" class="dh-checkin-view">
-        <p class="dh-msg">Uçuş bilgileri alınıyor...</p>
+        <p class="dh-msg">{{ __('Uçuş bilgileri alınıyor...') }}</p>
     </div>
 </main>
+
+{{-- js-translations status-result.js'ten ÖNCE: dhT() burada tanımlanıyor. --}}
+@include('partials.js-translations')
 
 <script src="{{ asset('js/status-result.js') }}"></script>
 </body>
