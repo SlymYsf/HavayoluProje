@@ -72,6 +72,25 @@ class FlightSearchController extends Controller
     }
 
     /**
+     * Verilen varış noktasına uçuş yapılan kalkış noktalarını döner.
+     *
+     * `destinations()`'ın simetriği. Kullanıcı önce varışı seçtiğinde kalkış
+     * listesi de daralsın diye eklendi; aksi halde tanımlı rotası olmayan bir
+     * çift seçilebiliyor ve arama 404 dönüyordu.
+     */
+    public function origins(int $airportId)
+    {
+        $originIds = Route::where('destination_airport_id', $airportId)
+            ->pluck('origin_airport_id');
+
+        $airports = Airport::whereIn('id', $originIds)
+            ->get(['id', 'iata_code', 'name', 'city', 'country', 'is_hub']);
+
+        return response()->json($this->localizeAirports($airports));
+    }
+
+
+    /**
      * Havalimanı adlarını arayüz diline çevirir ve o dile göre sıralar.
      *
      * Adlar veritabanında yalnızca Türkçe tutuluyor. Her dil için ayrı sütun

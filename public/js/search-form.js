@@ -13,7 +13,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var allAirports = [];
     var searchItems = [];
+
+    /* Karşı alan seçildiğinde daralan listeler. Filtreleme iki yönlü:
+       kalkış seçilince varışlar, varış seçilince kalkışlar daralıyor.
+       Tek yönlüyken tanımlı rotası olmayan çiftler seçilebiliyordu. */
     var destinationItems = null;
+    var originItems = null;
+
     var activeField = null;
 
     /* Metinler ve sıralama dili js-translations.blade.php'den geliyor;
@@ -107,6 +113,17 @@ document.addEventListener('DOMContentLoaded', function () {
         return items;
     }
 
+    /** Alanın seçenek havuzu: karşı alan seçiliyse daraltılmış liste. */
+    function poolFor(key) {
+        if (key === 'destination' && destinationItems) return destinationItems;
+        if (key === 'origin' && originItems) return originItems;
+        return searchItems;
+    }
+
+    function counterpartOf(key) {
+        return key === 'origin' ? 'destination' : 'origin';
+    }
+
     function rehydratePrefilledFields() {
         var snapshot = {};
         ['origin', 'destination'].forEach(function (key) {
@@ -129,10 +146,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 fields[key].hidden.value = snap.hiddenId;
                 fields[key].input.value = snap.label;
                 renderSelectedDisplay(key, match);
-
-                if (key === 'origin') {
-                    loadDestinationsFor(match.ids[0]);
-                }
+                loadCounterpartFor(key, match.ids[0]);
             }
         });
     }
@@ -162,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 field.dropdown.hidden = true;
 
                 if (field.snapshot && !field.selectedItem) {
-                    setField(key, field.snapshot, { skipLoadDestinations: true });
+                    setField(key, field.snapshot, { skipCounterpartLoad: true });
                     field.snapshot = null;
                 }
             }
@@ -174,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function () {
         field.dropdown.innerHTML = '';
         query = query.trim().toLocaleLowerCase(locale);
 
-        var pool = (key === 'destination' && destinationItems) ? destinationItems : searchItems;
+        var pool = poolFor(key);
 
         if (query === '') {
             var allBtn = document.createElement('div');
@@ -224,21 +238,63 @@ document.addEventListener('DOMContentLoaded', function () {
         fields[key].selectedItem = item;
         fields[key].snapshot = null;
         renderSelectedDisplay(key, item);
-        if (key === 'origin' && !options.skipLoadDestinations) {
-            loadDestinationsFor(item.ids[0]);
+
+        if (!options.skipCounterpartLoad) {
+            loadCounterpartFor(key, item.ids[0]);
         }
     }
 
-    function loadDestinationsFor(originId) {
-        clearSelectedDisplay('destination');
-        fields.destination.hidden.value = '';
-        fields.destination.input.value = '';
-        destinationItems = null;
+    /** Seçilen alanın karşısındaki listeyi daraltır. */
+    function loadCounterpartFor(key, airportId) {
+        var url = key === 'origin'
+            ? '/api/airports/' + airportId + '/destinations'
+            : '/api/airports/' + airportId + '/origins';
 
-        fetch('/api/airports/' + originId + '/destinations')
+        var other = counterpartOf(key);
+
+        fetch(url)
             .then(function (res) { return res.json(); })
-            .then(function (airports) { destinationItems = buildItemsFrom(airports); })
-            .catch(function () { destinationItems = null; });
+            .then(function (airports) {
+                var items = buildItemsFrom(airports);
+
+                if (other === 'destination') {
+                    destinationItems = items;
+                } else {
+                    originItems = items;
+                }
+
+                pruneIfInvalid(other, items);
+            })
+            .catch(function () {
+                if (other === 'destination') {
+                    destinationItems = null;
+                } else {
+                    originItems = null;
+                }
+            });
+    }
+
+    /**
+     * Karşı alandaki seçim yeni listede yoksa temizlenir, geçerliyse korunur.
+     * Eskiden kalkış değişince varış koşulsuz siliniyordu; rota hâlâ geçerliyse
+     * kullanıcıyı yeniden seçmeye zorlamak gereksizdi.
+     */
+    function pruneIfInvalid(key, pool) {
+        var selected = fields[key].selectedItem;
+
+        if (!selected) {
+            return;
+        }
+
+        var stillValid = pool.some(function (item) { return item.label === selected.label; });
+
+        if (stillValid) {
+            return;
+        }
+
+        clearSelectedDisplay(key);
+        fields[key].hidden.value = '';
+        fields[key].input.value = '';
     }
 
     function renderSelectedDisplay(key, item) {
@@ -283,7 +339,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function buildCountryList() {
-        var pool = (activeField === 'destination' && destinationItems) ? destinationItems : searchItems;
+        var pool = poolFor(activeField);
         var countries = [];
         pool.forEach(function (item) {
             if (item.type === 'airport' && countries.indexOf(item.country) === -1) {
@@ -321,13 +377,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function showAirportsOf(country) {
-        var pool = (activeField === 'destination' && destinationItems) ? destinationItems : searchItems;
+        var pool = poolFor(activeField);
         var list = pool.filter(function (item) { return item.country === country; });
         airportCount.textContent = list.filter(function (i) { return i.type === 'airport'; }).length;
         airportList.innerHTML = '';
 
         if (!list.length) {
-            airportList.innerHTML = '<div class="dh-modal-hint">' + t('Seçtiğiniz kalkış noktasından bu ülkeye uçuş bulunmuyor.') + '</div>';
+            // Boş sonucun sebebi hangi alanın daraltıldığına bağlı
+            var message = activeField === 'origin'
+                ? t('Bu ülkeden seçtiğiniz varış noktasına uçuş bulunmuyor.')
+                : t('Seçtiğiniz kalkış noktasından bu ülkeye uçuş bulunmuyor.');
+            airportList.innerHTML = '<div class="dh-modal-hint">' + message + '</div>';
             return;
         }
 
@@ -356,7 +416,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.body.style.overflow = '';
 
         if (activeField && fields[activeField].snapshot && !fields[activeField].selectedItem) {
-            setField(activeField, fields[activeField].snapshot, { skipLoadDestinations: true });
+            setField(activeField, fields[activeField].snapshot, { skipCounterpartLoad: true });
             fields[activeField].snapshot = null;
         }
     }
@@ -376,11 +436,24 @@ document.addEventListener('DOMContentLoaded', function () {
         fields.origin.input.value = '';
         fields.destination.input.value = '';
 
+        // Eski daraltmalar artık geçersiz; ikisi de sıfırlanıp yeniden kuruluyor
+        destinationItems = null;
+        originItems = null;
+
+        // Karşı liste yüklemesi ikisi de yerine oturduktan SONRA tetikleniyor:
+        // aksi halde henüz atanmamış alan geçersiz sayılıp temizleniyordu.
         if (destItem) {
-            setField('origin', destItem);
+            setField('origin', destItem, { skipCounterpartLoad: true });
         }
         if (originItem) {
-            setField('destination', originItem);
+            setField('destination', originItem, { skipCounterpartLoad: true });
+        }
+
+        if (destItem) {
+            loadCounterpartFor('origin', destItem.ids[0]);
+        }
+        if (originItem) {
+            loadCounterpartFor('destination', originItem.ids[0]);
         }
     });
 
