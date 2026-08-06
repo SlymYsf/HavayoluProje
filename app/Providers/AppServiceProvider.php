@@ -28,6 +28,19 @@ class AppServiceProvider extends ServiceProvider
             \App\Services\Sms\SmsGatewayInterface::class,
             \App\Services\Sms\LogSmsGateway::class
         );
+        $this->app->bind(
+            \App\Services\Market\Contracts\ExchangeRateProviderInterface::class,
+            \App\Services\Market\TcmbExchangeRateProvider::class
+        );
+
+        $this->app->bind(
+            \App\Services\Market\Contracts\JetFuelPriceProviderInterface::class,
+            \App\Services\Market\EiaJetFuelProvider::class
+        );
+        $this->app->bind(
+            \App\Services\Market\Contracts\CpiProviderInterface::class,
+            \App\Services\Market\EvdsCpiProvider::class
+        );
     }
 
     /**

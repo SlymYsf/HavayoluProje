@@ -35,4 +35,26 @@ return [
         ],
     ],
 
+    /*
+    | EIA (U.S. Energy Information Administration) — jet yakıtı spot fiyatı.
+    | Ücretsiz anahtar: https://www.eia.gov/opendata/register.php
+    */
+    'eia' => [
+        'key' => env('EIA_API_KEY'),
+    ],
+    /*
+    | TCMB EVDS — Tüketici Fiyat Endeksi.
+    | Ücretsiz anahtar: https://evds2.tcmb.gov.tr (üye ol -> profil -> API anahtarı)
+    */
+    /*
+    | TCMB EVDS — Tüketici Fiyat Endeksi.
+    | Ücretsiz anahtar: https://evds3.tcmb.gov.tr (üye ol -> profil -> API anahtarı)
+    |
+    | Taban adres yapılandırılabilir: servis 2026'da evds2'den evds3'e taşındı,
+    | eski adres istekleri portala yönlendirip HTML döndürüyor.
+    */
+    'evds' => [
+        'key'      => env('EVDS_API_KEY'),
+        'base_url' => env('EVDS_BASE_URL', 'https://evds3.tcmb.gov.tr/service/evds/'),
+    ],
 ];

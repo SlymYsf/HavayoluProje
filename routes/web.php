@@ -6,14 +6,21 @@ use App\Http\Controllers\FareCalendarController;
 use App\Http\Controllers\FlightSearchController;
 use App\Http\Controllers\FlightStatusController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\SeatMapController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TicketManagementController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\LocaleController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\FleetController;
 
 /* ===== SAYFALAR ===== */
 
+Route::get('/fleet', [\App\Http\Controllers\FleetController::class, 'index'])->name('static.fleet');
+Route::get('/yesilkoy-havalimani', fn () => view('static.yesilkoy'))->name('static.yesilkoy');
+Route::get('/filo', [FleetController::class, 'index'])->name('static.fleet');
+Route::get('/kabin-siniflari/{class?}', [\App\Http\Controllers\CabinClassController::class, 'show'])
+    ->name('static.cabin');
 Route::get('/uye-ol', fn () => view('auth.register'))->name('auth.register');
 Route::get('/', [FlightSearchController::class, 'index']);
 Route::get('/ucus-durumu', fn () => view('flights.status'))->name('flights.status');
@@ -24,8 +31,10 @@ Route::get('/bilet-yonetimi', fn () => view('flights.manage'))->name('flights.ma
 
 Route::get('/api/airports', [FlightSearchController::class, 'airports']);
 Route::get('/api/airports/{airport}/destinations', [FlightSearchController::class, 'destinations']);
+Route::get('/api/airports/{airport}/origins', [FlightSearchController::class, 'origins']);
 Route::get('/api/flights/search', [FlightSearchController::class, 'search']);
 Route::get('/api/flights/status', [FlightStatusController::class, 'show']);
+Route::get('/api/flights/{flight}/seat-map', [SeatMapController::class, 'show']);
 Route::get('/api/fares/calendar', [FareCalendarController::class, 'strip']);
 Route::get('/api/country-codes', [CountryCodeController::class, 'index']);
 Route::get('/api/announcements', [AnnouncementController::class, 'index']);
@@ -45,6 +54,12 @@ Route::get('/yolcu-bilgileri', [ReservationController::class, 'passengers'])
 Route::middleware('reservation.timeout')->group(function () {
     Route::post('/rezervasyon/yolcular', [ReservationController::class, 'storePassengers'])
         ->name('reservation.passengers.store');
+
+    Route::get('/koltuk-secimi', [ReservationController::class, 'seats'])
+        ->name('reservation.seats');
+
+    Route::post('/rezervasyon/koltuklar', [ReservationController::class, 'storeSeats'])
+        ->name('reservation.seats.store');
 
     Route::get('/odeme', [ReservationController::class, 'payment'])
         ->name('reservation.payment');
@@ -87,7 +102,10 @@ if (app()->isLocal()) {
 
         abort_if($tickets->isEmpty(), 404, 'Bu PNR bulunamadı.');
 
-        return new \App\Mail\ReservationConfirmed($pnr, $tickets, $tickets->sum('final_price'));
+        // Ödenen toplam = bilet ücreti + koltuk ücreti
+        $total = $tickets->sum(fn ($t) => (float) $t->final_price + (float) $t->seat_fee);
+
+        return new \App\Mail\ReservationConfirmed($pnr, $tickets, $total);
     });
 
     // Biniş kartı
