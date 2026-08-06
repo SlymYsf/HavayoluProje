@@ -47,9 +47,8 @@
                 [
                     'title' => __('Kabin sınıfı'),
                     'links' => [
-                        ['text' => 'Economy',         'href' => '#'],
-                        ['text' => 'Premium Economy', 'href' => '#'],
-                        ['text' => 'Business',        'href' => '#'],
+                        ['text' => 'Economy',         'href' => route('static.cabin', ['class' => 'economy'])],
+                        ['text' => 'Business',        'href' => route('static.cabin', ['class' => 'business'])],
                     ],
                 ],
                 [

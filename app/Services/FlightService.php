@@ -53,6 +53,12 @@ class FlightService
         return true;
     }
 
+    /**
+     * Uçuşta satışa açık kabin sınıfları.
+     *
+     * Premium Economy 5 Ağustos 2026'da kaldırıldı; koltukları Economy'ye
+     * devredildi. Metot artık en fazla iki sınıf döner.
+     */
     public function getSellableCabinClasses(Aircraft $aircraft, Route $route): array
     {
         if ($aircraft->body_type === 'narrow' && $route->route_type === 'domestic') {
@@ -63,10 +69,6 @@ class FlightService
 
         if ($aircraft->business_seats > 0) {
             $classes[] = 'business';
-        }
-
-        if ($aircraft->premium_economy_seats > 0) {
-            $classes[] = 'premium_economy';
         }
 
         return $classes;
