@@ -122,6 +122,7 @@
 @include('partials.site-search')
 @include('partials.auth-modal')
 @include('partials.js-translations')
+@include('partials.footer')
 
 <script src="{{ asset('js/mega-menu.js') }}"></script>
 <script src="{{ asset('js/locale-panel.js') }}"></script>

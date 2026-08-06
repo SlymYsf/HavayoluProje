@@ -1,0 +1,625 @@
+/* ===== YEŞİLKÖY HAVALİMANI SAYFASI — 4 Ağustos 2026 =====
+ * Tüm kurallar .dh-yk-body altında: dh-base ve dh-layout'un genel
+ * kurallarını yanlışlıkla ezmemek için kapsam dar tutuluyor. */
+
+.dh-yk-body {
+    background: #FFFFFF;
+    overflow-x: hidden;
+}
+
+/* Header'ın altındaki boşluk — main'in üstünde bir margin bırakmıyoruz
+   ki quote bar doğrudan header'a otursun. */
+.dh-yk-body main {
+    margin: 0;
+    padding: 0;
+    background: #FFFFFF;
+}
+
+/* Alıntı çubuğu — hero'nun üstünde, sayfaya karakter veren tek satır. */
+
+.dh-yk-body .dh-yk-quote-bar {
+    background: #FFFFFF;
+    padding: 44px 24px 36px;
+    text-align: center;
+    border-bottom: 0.5px solid var(--dh-border);
+}
+
+.dh-yk-body .dh-yk-quote {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.dh-yk-body .dh-yk-quote p {
+    font-family: 'Space Grotesk', sans-serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 36px;
+    line-height: 1.3;
+    color: var(--dh-ink);
+    margin-bottom: 14px;
+}
+
+.dh-yk-body .dh-yk-quote cite {
+    display: block;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-style: normal;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--dh-muted);
+}
+
+/* Hero */
+
+.dh-yk-body .dh-yk-hero {
+    position: relative;
+    width: 100%;
+    height: 560px;
+    overflow: hidden;
+    background: var(--dh-dark);
+}
+
+.dh-yk-body .dh-yk-hero-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dh-yk-body .dh-yk-slide {
+    flex: none;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+.dh-yk-body .dh-yk-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.dh-yk-body .dh-yk-hero-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 60px 40px 80px;
+    background: linear-gradient(to top, rgba(22, 20, 20, 0.75) 0%, rgba(22, 20, 20, 0) 100%);
+    color: #FFFFFF;
+    text-align: center;
+    pointer-events: none;
+}
+
+.dh-yk-body .dh-yk-eyebrow {
+    display: block;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.86);
+    margin-bottom: 10px;
+}
+
+.dh-yk-body .dh-yk-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 52px;
+    font-weight: 500;
+    line-height: 1.1;
+    margin-bottom: 12px;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+.dh-yk-body .dh-yk-subtitle {
+    font-size: 17px;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+}
+
+/* Yön butonları */
+
+.dh-yk-body .dh-yk-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(22, 20, 20, 0.55);
+    color: #FFFFFF;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+}
+
+.dh-yk-body .dh-yk-nav:hover {
+    background: rgba(22, 20, 20, 0.85);
+}
+
+.dh-yk-body .dh-yk-nav-prev { left: 24px; }
+.dh-yk-body .dh-yk-nav-next { right: 24px; }
+
+/* Noktalar */
+
+.dh-yk-body .dh-yk-dots {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 24px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    z-index: 2;
+}
+
+.dh-yk-body .dh-yk-dot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.45);
+    cursor: pointer;
+    transition: width 0.2s ease, background 0.2s ease;
+}
+
+.dh-yk-body .dh-yk-dot-active {
+    width: 24px;
+    border-radius: 4px;
+    background: #FFFFFF;
+}
+
+/* Metin — beyaz zemin, altında hero'nun izinin görünmesini engellemek
+   için tam opak arka plan. */
+
+.dh-yk-body .dh-yk-story {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 72px 24px 96px;
+    background: #FFFFFF;
+    color: var(--dh-ink);
+    position: relative;
+    z-index: 1;
+}
+
+.dh-yk-body .dh-yk-lead {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    line-height: 1.65;
+    font-weight: 500;
+    color: var(--dh-ink);
+    margin-bottom: 40px;
+}
+
+.dh-yk-body .dh-yk-story h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--dh-ink);
+    margin: 30px 0 14px;
+    padding-top: 30px;
+    position: relative;
+}
+
+.dh-yk-body .dh-yk-story h2::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    height: 1px;
+    background: #E6E6E6;
+}
+
+.dh-yk-body .dh-yk-story h2:first-of-type {
+    padding-top: 0;
+    margin-top: 40px;
+}
+
+.dh-yk-body .dh-yk-story h2:first-of-type::before {
+    display: none;
+}
+
+.dh-yk-body .dh-yk-story p {
+    font-size: 16px;
+    line-height: 1.85;
+    color: var(--dh-muted);
+    margin-bottom: 12px;
+}
+
+/* Header sayfa kaydırılırken üstte kalıyor. Kapsam Yeşilköy sayfasıyla
+   sınırlı: ana sayfada arama formunun otomatik tamamlama katmanları
+   header'a zaman zaman girdiği için orada sabitleme sorun çıkarabilir. */
+.dh-yk-body .dh-header {
+    position: sticky;
+    top: 0;
+    z-index: 300;
+}
+
+/* Metin bloğu ile footer arasında geniş beyaz alanın devamlılığı için
+   story ile ilk sonraki eleman arasında ekstra padding-bottom var. */
+
+@media (max-width: 700px) {
+    .dh-yk-body .dh-yk-hero {
+        height: 420px;
+    }
+
+    .dh-yk-body .dh-yk-title {
+        font-size: 36px;
+    }
+
+    .dh-yk-body .dh-yk-subtitle {
+        font-size: 15px;
+    }
+
+    .dh-yk-body .dh-yk-nav {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .dh-yk-body .dh-yk-nav-prev { left: 12px; }
+    .dh-yk-body .dh-yk-nav-next { right: 12px; }
+
+    .dh-yk-body .dh-yk-story {
+        padding: 48px 20px 72px;
+    }
+
+    .dh-yk-body .dh-yk-lead {
+        font-size: 17px;
+    }
+
+    .dh-yk-body .dh-yk-quote p {
+        font-size: 26px;
+    }
+}
+
+/* ===== FİLO SAYFASI — 4 Ağustos 2026 ===== */
+
+.dh-fleet-body {
+    background: #FFFFFF;
+    overflow-x: hidden;
+}
+
+.dh-fleet-body main {
+    margin: 0;
+    padding: 0;
+    background: #FFFFFF;
+}
+
+.dh-fleet-body .dh-header {
+    position: sticky;
+    top: 0;
+    z-index: 300;
+}
+
+/* Hero */
+
+.dh-fleet-hero {
+    width: 100%;
+    height: 610px;
+    overflow: hidden;
+    background: #0B1B2C;
+}
+
+.dh-fleet-hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Tanıtım metni */
+
+.dh-fleet-intro {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 24px 40px;
+    text-align: center;
+}
+
+.dh-fleet-intro h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 34px;
+    font-weight: 500;
+    color: var(--dh-ink);
+    margin-bottom: 18px;
+}
+
+.dh-fleet-intro p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--dh-muted);
+}
+
+/* Kartlar */
+
+.dh-fleet-grid-wrap {
+    max-width: var(--dh-max);
+    margin: 0 auto;
+    padding: 20px 24px 96px;
+}
+
+.dh-fleet-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.dh-fleet-card {
+    background: #FFFFFF;
+    border: 0.5px solid var(--dh-border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.dh-fleet-card:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.dh-fleet-card-media {
+    aspect-ratio: 4 / 3;
+    background: var(--dh-cloud);
+    overflow: hidden;
+}
+
+.dh-fleet-card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.dh-fleet-card-body {
+    padding: 20px 22px 24px;
+}
+
+.dh-fleet-card-body h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--dh-ink);
+    margin-bottom: 8px;
+}
+
+.dh-fleet-card-tagline {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--dh-muted);
+    margin-bottom: 18px;
+    min-height: 68px;
+}
+
+.dh-fleet-card-specs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 0.5px solid var(--dh-border);
+}
+
+.dh-fleet-card-specs > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dh-fleet-card-specs dt {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--dh-placeholder);
+}
+
+.dh-fleet-card-specs dd {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--dh-ink);
+}
+
+@media (max-width: 900px) {
+    .dh-fleet-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .dh-fleet-hero {
+        height: 340px;
+    }
+
+    .dh-fleet-intro h1 {
+        font-size: 26px;
+    }
+
+    .dh-fleet-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dh-fleet-card-tagline {
+        min-height: 0;
+    }
+}
+
+/* ===== KABİN SINIFI SAYFALARI — 4 Ağustos 2026 ===== */
+
+.dh-cabin-body {
+    background: #FFFFFF;
+    background-image: none;
+    overflow-x: hidden;
+}
+.dh-cabin-body main {
+    margin: 0;
+    padding: 0;
+    background: #FFFFFF;
+}
+
+.dh-cabin-body .dh-header {
+    position: sticky;
+    top: 0;
+    z-index: 300;
+}
+
+/* Sekme şeridi — Business ve Economy arası geçiş. Bağlantı, sayfa yenilemesi
+   yapıyor çünkü içerik controller'da hazırlanıyor; sekmeler görsel olarak
+   THY'ye yakın: alt kırmızı çizgiyle aktif olan işaretleniyor. */
+
+.dh-cabin-tabs-bar {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    padding: 6px 24px;
+    background: #FFFFFF;
+    border-bottom: 0.5px solid var(--dh-border);
+    position: sticky;
+    top: 60px; /* header altında kalıyor */
+    z-index: 200;
+}
+
+.dh-cabin-tab {
+    position: relative;
+    padding: 12px 4px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--dh-muted);
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.dh-cabin-tab:hover {
+    color: var(--dh-ink);
+}
+
+.dh-cabin-tab-active {
+    color: var(--dh-ink);
+}
+
+.dh-cabin-tab-active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--dh-red);
+    border-radius: 2px;
+}
+
+/* Hero — büyük görsel, altta koyu gradyanla başlık */
+
+.dh-cabin-hero {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1400 / 748;
+    max-height: 720px;
+    overflow: hidden;
+    background: var(--dh-dark);
+}
+
+.dh-cabin-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+.dh-cabin-hero-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 80px 40px 60px;
+    background: linear-gradient(to top, rgba(22, 20, 20, 0.85) 0%, rgba(22, 20, 20, 0) 100%);
+    color: #FFFFFF;
+    max-width: var(--dh-max);
+    margin: 0 auto;
+}
+
+.dh-cabin-hero-overlay h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 44px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+.dh-cabin-hero-overlay p {
+    font-size: 18px;
+    max-width: 620px;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Tanıtım metni */
+
+.dh-cabin-intro {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 64px 24px 40px;
+    text-align: center;
+}
+
+.dh-cabin-intro p {
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--dh-muted);
+}
+
+/* Özellik ızgarası */
+
+.dh-cabin-features-wrap {
+    max-width: var(--dh-max);
+    margin: 0 auto;
+    padding: 20px 24px 96px;
+}
+
+.dh-cabin-features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+}
+
+.dh-cabin-feature {
+    text-align: left;
+}
+
+.dh-cabin-feature > i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--dh-red-tint);
+    color: var(--dh-red);
+    font-size: 24px;
+    margin-bottom: 16px;
+}
+
+.dh-cabin-feature h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--dh-ink);
+    margin-bottom: 8px;
+}
+
+.dh-cabin-feature p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--dh-muted);
+}
+
+

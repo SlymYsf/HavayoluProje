@@ -133,30 +133,54 @@ class FlightDisruptionService
         $route = $flight->route;
 
         return sprintf(
-            '%s %s-%s seferi %d dakika gecikmeli',
+            '%s seferi %s güzergâhında %s gecikmeli',
             $flight->flight_number,
-            $route->originAirport->iata_code,
-            $route->destinationAirport->iata_code,
-            $minutes
+            $route->originAirport->iata_code . '–' . $route->destinationAirport->iata_code,
+            $this->formatDuration($minutes)
         );
     }
 
     private function buildBody(Flight $flight, int $minutes, string $reason): string
     {
         $route = $flight->route;
+        $estimated = $flight->estimatedDepartureTime();
+
+        // Bugün / yarın gibi görece ifade, tarih yerine daha okunur.
+        $when = $flight->departure_time->isToday()
+            ? 'bugün'
+            : ($flight->departure_time->isTomorrow() ? 'yarın' : $flight->departure_time->format('d.m.Y'));
 
         return sprintf(
-            '%s sebebiyle %s tarihli %s (%s → %s) seferimiz %d dakika gecikmeli kalkacaktır. '
-            . 'Planlanan kalkış: %s. Tahmini kalkış: %s. Anlayışınız için teşekkür ederiz.',
-            $reason,
-            $flight->departure_time->format('d.m.Y'),
-            $flight->flight_number,
+            '%s sebebiyle %s saat %s\'da yapılacak %s–%s seferimiz %s gecikmeli kalkacaktır. '
+            . 'Tahmini kalkış saati %s olarak güncellenmiştir. '
+            . 'Yaşanan aksaklık için özür diler, anlayışınıza teşekkür ederiz.', $reason,
+            $when,
+            $flight->departure_time->format('H:i'),
             $route->originAirport->city,
             $route->destinationAirport->city,
-            $minutes,
-            $flight->departure_time->format('H:i'),
-            $flight->estimatedDepartureTime()->format('H:i')
+            $this->formatDuration($minutes),
+            $estimated->format('H:i')
         );
+    }
+
+    /**
+     * Süreyi okunabilir biçimde döner: 45 → "45 dakika",
+     * 75 → "1 saat 15 dakika", 120 → "2 saat".
+     */
+    private function formatDuration(int $minutes): string
+    {
+        if ($minutes < 60) {
+            return $minutes . ' dakika';
+        }
+
+        $hours = intdiv($minutes, 60);
+        $remaining = $minutes % 60;
+
+        if ($remaining === 0) {
+            return $hours . ' saat';
+        }
+
+        return $hours . ' saat ' . $remaining . ' dakika';
     }
 
     /**
