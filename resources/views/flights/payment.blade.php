@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ asset('css/dh-layout.css') }}">
     <link rel="stylesheet" href="{{ asset('css/dh-components.css') }}">
     <link rel="stylesheet" href="{{ asset('css/dh-booking.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dh-seatmap.css') }}">
     <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
 </head>
 <body class="dh-results-body">
@@ -28,6 +29,10 @@
             <li class="dh-step dh-step-done">
                 <span class="dh-step-icon"><i class="ti ti-check" aria-hidden="true"></i></span>
                 <span class="dh-step-label">Yolcu bilgileri</span>
+            </li>
+            <li class="dh-step dh-step-done">
+                <span class="dh-step-icon"><i class="ti ti-check" aria-hidden="true"></i></span>
+                <span class="dh-step-label">Koltuk seçimi</span>
             </li>
             <li class="dh-step dh-step-active">
                 <span class="dh-step-icon"><i class="ti ti-credit-card" aria-hidden="true"></i></span>
@@ -101,12 +106,29 @@
             </div>
 
             <div class="dh-checkin-details">
-                @foreach($reservation['passengers'] as $p)
+                @foreach($reservation['passengers'] as $i => $p)
+                    @php
+                        // Yolcunun bacak bazında seçtiği koltuklar — bebeklerde boş kalır
+                        $paxSeats = [];
+                        foreach ($legs as $direction => $leg) {
+                            if (! empty($leg['seats'][$i])) {
+                                $paxSeats[] = ($direction === 'outbound' ? 'Gidiş' : 'Dönüş')
+                                    . ' ' . $leg['seats'][$i];
+                            }
+                        }
+                    @endphp
                     <div class="dh-detail-row">
                         <span class="dh-detail-label">
                             {{ ['adult'=>'Yetişkin','child'=>'Çocuk','infant'=>'Bebek','student'=>'Öğrenci'][$p['type']] }}
                         </span>
-                        <span class="dh-detail-value">{{ $p['first_name'] }} {{ $p['last_name'] }}</span>
+                        <span class="dh-detail-value">
+                            {{ $p['first_name'] }} {{ $p['last_name'] }}
+                            @if($paxSeats)
+                                <span class="dh-pay-seat">{{ implode(' · ', $paxSeats) }}</span>
+                            @elseif($p['type'] !== 'infant')
+                                <span class="dh-pay-seat dh-pay-seat-auto">Koltuk otomatik atanacak</span>
+                            @endif
+                        </span>
                     </div>
                 @endforeach
                 <div class="dh-detail-row">
@@ -117,7 +139,7 @@
         </section>
 
         <div class="dh-reservation-actions">
-            <a href="javascript:history.back()" class="dh-checkin-back">Yolcu bilgilerine dön</a>
+            <a href="{{ route('reservation.seats') }}" class="dh-checkin-back">Koltuk seçimine dön</a>
             <button type="submit" class="dh-btn-primary" id="pay-btn">
                 Ödemeyi tamamla <i class="ti ti-lock" aria-hidden="true"></i>
             </button>
@@ -154,9 +176,25 @@
                                 <span>{{ number_format($row['subtotal'], 0, ',', '.') }}₺</span>
                             </div>
                         @endforeach
+
+                        {{-- Koltuk ücreti bacak bazında gösteriliyor: gidiş ve dönüşün
+                             menzil kategorisi farklıysa tarifeleri de farklı olabilir --}}
+                        @if($leg['seat_fee'] > 0)
+                            <div class="dh-summary-row">
+                                <span>Koltuk seçimi</span>
+                                <span>{{ number_format($leg['seat_fee'], 0, ',', '.') }}₺</span>
+                            </div>
+                        @endif
                     </div>
                 </div>
             @endforeach
+
+            @if($seatFeeTotal > 0)
+                <div class="dh-summary-row dh-summary-seatfee">
+                    <span>Koltuk ücretleri toplamı</span>
+                    <span>{{ number_format($seatFeeTotal, 0, ',', '.') }}₺</span>
+                </div>
+            @endif
 
             <div class="dh-summary-total">
                 <span>Toplam</span>

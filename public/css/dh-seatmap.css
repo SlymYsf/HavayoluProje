@@ -1,0 +1,533 @@
+/**
+ * dh-seatmap.css — Manuel koltuk seçimi ekranı (7. CSS dosyası).
+ *
+ * Yalnızca /koltuk-secimi sayfasında yükleniyor. Yükleme sırası:
+ * base -> layout -> components -> booking -> seatmap
+ *
+ * Koltuk tipleri renk yerine ALT ŞERİTLE ayrışıyor: koltuğun kendisi her
+ * zaman aynı gövde rengini taşıyor, tipini altındaki 3px'lik şerit anlatıyor.
+ * Sebep: seçili koltuk zaten dolu kırmızı; tipleri de gövde rengiyle ayırsaydık
+ * "seçili mi, ücretli mi" ayrımı okunmaz hale gelirdi.
+ */
+
+:root {
+    --dh-seat-size: 34px;
+    --dh-seat-gap: 6px;
+    --dh-seat-amber: #E0912F;
+    --dh-seat-teal: #1F8A70;
+
+    /* Koltuk gövdesi ve kolçak renkleri. Marka paletinin dışında bilinçli
+       olarak: kabin planı bir arayüz öğesi değil, uçağın şeması. */
+    --dh-seat-body: #2B3A55;
+    --dh-seat-arm: #C3C9D6;
+    --dh-seat-body-taken: #B7BCC7;
+    --dh-seat-arm-taken: #D8DBE2;
+}
+
+/* ===== BÖLÜM KABI ===== */
+
+.dh-seat-section {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 22px 26px 26px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.dh-seat-section-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding-bottom: 16px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--dh-cloud);
+}
+
+.dh-seat-section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--dh-ink);
+    margin: 4px 0 4px;
+}
+
+.dh-seat-section-meta {
+    font-size: 13px;
+    color: var(--dh-muted);
+}
+
+.dh-seat-section-total {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    flex: none;
+}
+
+.dh-seat-total-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--dh-muted);
+}
+
+.dh-seat-total-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--dh-red);
+    line-height: 1.1;
+}
+
+/* ===== YOLCU SEÇİCİ ===== */
+
+.dh-seat-pax {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.dh-seat-pax-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    min-width: 170px;
+    padding: 10px 16px;
+    background: #FFFFFF;
+    border: 1px solid var(--dh-border);
+    border-radius: 10px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    text-align: left;
+    cursor: pointer;
+}
+
+.dh-seat-pax-chip:hover:not(:disabled) {
+    border-color: var(--dh-red-tint-strong);
+}
+
+.dh-seat-pax-chip-active {
+    border-color: var(--dh-red);
+    background: var(--dh-red-tint);
+}
+
+.dh-seat-pax-chip-none,
+.dh-seat-pax-chip:disabled {
+    background: var(--dh-cloud);
+    color: var(--dh-placeholder);
+    cursor: not-allowed;
+}
+
+.dh-seat-pax-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--dh-ink);
+}
+
+.dh-seat-pax-chip:disabled .dh-seat-pax-name {
+    color: var(--dh-placeholder);
+}
+
+.dh-seat-pax-meta {
+    font-size: 12px;
+    color: var(--dh-muted);
+}
+
+.dh-seat-pax-chip-active .dh-seat-pax-meta {
+    color: var(--dh-red-dark);
+}
+
+/* ===== LEJANT ===== */
+
+.dh-seat-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    background: var(--dh-cloud);
+    border-radius: 10px;
+}
+
+.dh-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--dh-muted);
+}
+
+/* Lejant örneği — koltukla aynı anatomi, küçültülmüş hâli */
+.dh-seat-chip {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    box-sizing: border-box;
+    background: var(--dh-seat-body);
+    border: none;
+    border-left: 3px solid var(--dh-seat-arm);
+    border-right: 3px solid var(--dh-seat-arm);
+    border-bottom: 3px solid var(--dh-seat-arm);
+    border-radius: 6px 6px 2px 2px;
+    flex: none;
+}
+
+
+/* ===== KABİN ===== */
+
+.dh-seat-map {
+    overflow-x: auto;
+}
+
+.dh-seat-loading {
+    padding: 40px 0;
+    text-align: center;
+    font-size: 14px;
+    color: var(--dh-muted);
+}
+
+/* Gövde: uçları yuvarlatılmış tek bir kap */
+.dh-cabin-shell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: max-content;
+    min-width: 100%;
+    padding: 28px 20px;
+    background: var(--dh-cloud);
+    border-radius: 140px 140px 60px 60px;
+}
+
+.dh-cabin-deck {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dh-seat-gap);
+}
+
+/* Harf başlığı ve sıralar aynı ızgara ölçüsünü paylaşıyor */
+.dh-cabin-letters,
+.dh-seat-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.dh-cabin-letters {
+    margin-bottom: 4px;
+}
+
+.dh-letter-block,
+.dh-seat-block {
+    display: flex;
+    gap: var(--dh-seat-gap);
+}
+
+.dh-letter-block span {
+    width: var(--dh-seat-size);
+    text-align: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--dh-muted);
+}
+
+.dh-cabin-letters > span:first-child,
+.dh-cabin-letters > span:last-child {
+    width: 26px;
+    flex: none;
+}
+
+.dh-row-num {
+    width: 26px;
+    flex: none;
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--dh-muted);
+}
+
+/* ===== KOLTUK ===== */
+
+/* Lejant örneği — koltukla aynı anatomi, küçültülmüş hâli */
+.dh-seat-chip {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    box-sizing: border-box;
+    background: var(--dh-seat-body);
+    border: none;
+    border-left: 3px solid var(--dh-seat-arm);
+    border-right: 3px solid var(--dh-seat-arm);
+    border-bottom: 3px solid var(--dh-seat-arm);
+    border-radius: 6px 6px 2px 2px;
+    flex: none;
+}
+
+/* ===== KOLTUK ===== */
+
+/* Anatomi kenarlıklarla kuruluyor: sol/sağ kenarlık kolçak, alt kenarlık
+   koltuk tipini gösteren şerit. Sözde-eleman kullanılmıyor — koltuk üzerindeki
+   yolcu numarası böylece ek bir katman gerekmeden en üstte kalıyor. */
+.dh-seat {
+    width: var(--dh-seat-size);
+    height: var(--dh-seat-size);
+    box-sizing: border-box;
+    flex: none;
+    padding: 0;
+    background: var(--dh-seat-body);
+    border: none;
+    border-left: 4px solid var(--dh-seat-arm);
+    border-right: 4px solid var(--dh-seat-arm);
+    border-bottom: 4px solid var(--dh-seat-arm);
+    border-radius: 8px 8px 3px 3px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.55);
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.dh-seat:hover:not(:disabled) {
+    color: #FFFFFF;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(43, 58, 85, 0.35);
+}
+
+.dh-seat-gap {
+    width: var(--dh-seat-size);
+    height: var(--dh-seat-size);
+    flex: none;
+}
+
+/* Tip şeritleri — standart koltukta şerit kolçakla aynı renk, yani görünmez */
+.dh-seat-standard,
+.dh-seat-chip.dh-seat-standard           { border-bottom-color: var(--dh-seat-arm); }
+.dh-seat-front_row,
+.dh-seat-chip.dh-seat-front_row          { border-bottom-color: var(--dh-red-tint-strong); }
+.dh-seat-extra_legroom,
+.dh-seat-chip.dh-seat-extra_legroom      { border-bottom-color: var(--dh-seat-amber); }
+.dh-seat-exit,
+.dh-seat-chip.dh-seat-exit               { border-bottom-color: var(--dh-red); }
+.dh-seat-bassinet,
+.dh-seat-chip.dh-seat-bassinet           { border-bottom-color: var(--dh-seat-teal); }
+
+/* Dolu koltuk — gövde de kolçak da soluyor, üzerinde çarpı işareti */
+.dh-seat-taken,
+.dh-seat:disabled,
+.dh-seat-chip.dh-seat-taken {
+    background: var(--dh-seat-body-taken);
+    border-left-color: var(--dh-seat-arm-taken);
+    border-right-color: var(--dh-seat-arm-taken);
+    border-bottom-color: var(--dh-seat-arm-taken);
+    color: rgba(255, 255, 255, 0.85);
+    cursor: not-allowed;
+}
+
+/* Seçili koltuk: gövde kırmızı, üzerinde yolcu sırası */
+.dh-seat-selected,
+.dh-seat-selected:hover {
+    background: var(--dh-red);
+    border-left-color: var(--dh-red-tint-strong);
+    border-right-color: var(--dh-red-tint-strong);
+    border-bottom-color: var(--dh-red-dark);
+    color: #FFFFFF;
+    font-size: 13px;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ===== ACİL ÇIKIŞ İŞARETİ ===== */
+
+.dh-exit-marker {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 30px;
+    margin: 6px 0;
+    border-top: 1px dashed var(--dh-red-tint-strong);
+    border-bottom: 1px dashed var(--dh-red-tint-strong);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--dh-red);
+}
+
+/* ===== HATA VE ÖZET ===== */
+
+.dh-seat-error {
+    margin-bottom: 14px;
+}
+
+.dh-seat-error[hidden] {
+    display: none;
+}
+
+.dh-summary-seatfee {
+    padding-top: 12px;
+    margin-top: 4px;
+    border-top: 1px dashed var(--dh-border);
+    font-weight: 500;
+}
+
+/* ===== DUYARLI DÜZEN ===== */
+
+@media (max-width: 900px) {
+    .dh-seat-section {
+        padding: 18px 16px 20px;
+    }
+
+    /* Gövde üç parçadan oluşuyor: burun, düz kabin, kuyruk. Üçü de aynı zemin
+     rengini taşıdığı için tek bir gövde gibi okunuyor; burun ve kuyruk daha dar
+     olduğu için uçak uçlara doğru inceliyor. */
+    .dh-cabin-shell {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: max-content;
+        min-width: 100%;
+    }
+
+    .dh-cabin-body {
+        width: 100%;
+        padding: 4px 20px 12px;
+        background: var(--dh-cloud);
+    }
+
+    .dh-fuselage-nose,
+    .dh-fuselage-tail {
+        width: 58%;
+        min-width: 220px;
+        background: var(--dh-cloud);
+    }
+
+    .dh-fuselage-nose {
+        height: 86px;
+        border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding-bottom: 12px;
+    }
+
+    .dh-fuselage-tail {
+        height: 76px;
+        border-radius: 0 0 46% 46% / 0 0 100% 100%;
+    }
+
+    /* Kokpit camı */
+    .dh-cockpit {
+        display: flex;
+        gap: 5px;
+    }
+
+    .dh-cockpit span {
+        width: 30px;
+        height: 13px;
+        background: var(--dh-seat-body);
+        opacity: 0.7;
+    }
+
+    .dh-cockpit span:first-child { border-radius: 12px 3px 3px 9px; }
+    .dh-cockpit span:last-child  { border-radius: 3px 12px 9px 3px; }
+
+    /* Kabin uçağın ucunda bitmiyorsa gövde kesik gösteriliyor */
+    .dh-fuselage-cut {
+        width: 100%;
+        height: 14px;
+        background: var(--dh-cloud);
+    }
+
+    .dh-fuselage-cut-top {
+        border-top: 2px dashed var(--dh-border);
+        border-radius: 10px 10px 0 0;
+    }
+
+    .dh-fuselage-cut-bottom {
+        border-bottom: 2px dashed var(--dh-border);
+        border-radius: 0 0 10px 10px;
+    }
+
+    /* Tuvalet ve mutfak birimleri */
+    .dh-cabin-service {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px 0;
+    }
+
+    .dh-service-unit {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 34px;
+        background: #FFFFFF;
+        border: 1px solid var(--dh-border);
+        border-radius: 5px;
+        font-size: 17px;
+        color: var(--dh-muted);
+    }
+
+    .dh-seat-pax-chip {
+        min-width: 140px;
+    }
+}
+
+@media (max-width: 600px) {
+    :root {
+        --dh-seat-size: 30px;
+        --dh-seat-gap: 5px;
+    }
+
+    .dh-cabin-letters,
+    .dh-seat-row {
+        gap: 12px;
+    }
+}
+
+/* ===== ÖDEME SAYFASI — SEÇİLEN KOLTUK ===== */
+
+.dh-pay-seat {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--dh-red);
+    margin-top: 2px;
+}
+
+.dh-pay-seat-auto {
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: var(--dh-placeholder);
+}
+
+/* Kabin ayracı — geniş gövdede üç kabin alt alta çiziliyor */
+
+.dh-cabin-name {
+    margin: 18px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--dh-border);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--dh-red);
+    text-align: center;
+}
+
+.dh-cabin-deck:first-child .dh-cabin-name {
+    margin-top: 0;
+}
+
+.dh-cabin-name-muted {
+    color: var(--dh-placeholder);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: none;
+}
+
+
+

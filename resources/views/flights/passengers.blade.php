@@ -31,6 +31,10 @@
                 <span class="dh-step-label">Yolcu bilgileri</span>
             </li>
             <li class="dh-step">
+                <span class="dh-step-icon"><i class="ti ti-armchair" aria-hidden="true"></i></span>
+                <span class="dh-step-label">Koltuk seçimi</span>
+            </li>
+            <li class="dh-step">
                 <span class="dh-step-icon"><i class="ti ti-credit-card" aria-hidden="true"></i></span>
                 <span class="dh-step-label">Ödeme</span>
             </li>
@@ -197,7 +201,7 @@
         <div class="dh-reservation-actions">
             <a href="javascript:history.back()" class="dh-checkin-back">Uçuş seçimine dön</a>
             <button type="submit" class="dh-btn-primary">
-                Ödemeye geç <i class="ti ti-arrow-right" aria-hidden="true"></i>
+                Koltuk seçimine geç <i class="ti ti-arrow-right" aria-hidden="true"></i>
             </button>
         </div>
     </form>

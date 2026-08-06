@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Flight;
+use App\Services\CabinLayoutService;
 use App\Services\FlightSearchService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -25,6 +26,11 @@ class ReservationController extends Controller
         'student' => 'Öğrenci',
     ];
 
+    private const CABIN_LABELS = [
+        'economy'         => 'Economy',
+        'business'        => 'Business',
+    ];
+
     /** Yolcu tipi başına kabul edilen yaş aralığı (Bölüm 4.8). null = üst sınır yok. */
     private const AGE_RANGES = [
         'adult'   => [12, null],
@@ -36,15 +42,19 @@ class ReservationController extends Controller
     /** Rezervasyonu tamamlamak için tanınan süre (dakika). */
     public const TIMEOUT_MINUTES = 15;
 
-    public function __construct(private FlightSearchService $searchService) {}
+    public function __construct(
+        private FlightSearchService $searchService,
+        private TicketService $ticketService,
+        private CabinLayoutService $cabinLayout,
+    ) {}
 
     public function passengers(Request $request)
     {
         $validated = $request->validate([
             'outbound_flight' => 'required|exists:flights,id',
-            'outbound_cabin'  => 'required|in:economy,premium_economy,business',
+            'outbound_cabin'  => 'required|in:economy,business',
             'inbound_flight'  => 'nullable|exists:flights,id',
-            'inbound_cabin'   => 'nullable|in:economy,premium_economy,business',
+            'inbound_cabin'   => 'nullable|in:economy,business',
             'adult'           => 'nullable|integer|min:0|max:9',
             'child'           => 'nullable|integer|min:0|max:9',
             'infant'          => 'nullable|integer|min:0|max:9',
@@ -128,9 +138,9 @@ class ReservationController extends Controller
     {
         $validated = $request->validate([
             'outbound_flight'         => 'required|exists:flights,id',
-            'outbound_cabin'          => 'required|in:economy,premium_economy,business',
+            'outbound_cabin'          => 'required|in:economy,business',
             'inbound_flight'          => 'nullable|exists:flights,id',
-            'inbound_cabin'           => 'nullable|in:economy,premium_economy,business',
+            'inbound_cabin'           => 'nullable|in:economy,,business',
             'contact_email'           => 'required|email|max:255',
             'contact_dial_code'       => 'required|string|max:6',
             'contact_country_iso'     => 'required|string|size:2|exists:countries,iso_code',
@@ -210,7 +220,125 @@ class ReservationController extends Controller
             $validated['contact_country_iso']
         );
 
+        // Yolcu bilgileri değiştiyse eski koltuk seçimi geçersizdir:
+        // yolcu tipi değişmiş olabilir, acil çıkış uygunluğu buna bağlı.
+        $validated['seats'] = [];
+
         session(['reservation' => $validated]);
+
+        return redirect()->route('reservation.seats');
+    }
+
+    /**
+     * Rezervasyon akışının 3. adımı — koltuk seçimi.
+     *
+     * Koltuk planı sayfada gömülü değil, `GET /api/flights/{flight}/seat-map`
+     * üzerinden çekiliyor: dolu koltuk listesi sayfa açıldığı anda taze olmalı.
+     */
+    public function seats()
+    {
+        $reservation = session('reservation');
+
+        if (! $reservation) {
+            return redirect('/')->withErrors([
+                'reservation' => 'Rezervasyon bilgileriniz bulunamadı. Lütfen yeniden arama yapın.',
+            ]);
+        }
+
+        [$legs, $grandTotal, $seatFeeTotal] = $this->rebuildLegs($reservation);
+
+        // Bebekler kucakta seyahat eder, koltuk seçmezler (Bölüm 4.8).
+        $seatPassengers = [];
+
+        foreach ($reservation['passengers'] as $i => $p) {
+            $seatPassengers[] = [
+                'index'        => $i,
+                'order'        => $i + 1,
+                'name'         => trim($p['first_name'] . ' ' . $p['last_name']),
+                'type'         => $p['type'],
+                'type_label'   => self::PASSENGER_LABELS[$p['type']],
+                'needs_seat'   => $p['type'] !== 'infant',
+            ];
+        }
+
+        return view('flights.seats', [
+            'reservation'  => $reservation,
+            'legs'         => $legs,
+            'passengers'   => $seatPassengers,
+            'hasInfant'    => collect($reservation['passengers'])->contains('type', 'infant'),
+            'selected'     => $reservation['seats'] ?? [],
+            'grandTotal'   => $grandTotal,
+            'seatFeeTotal' => $seatFeeTotal,
+            'cabinLabels'  => self::CABIN_LABELS,
+            'expiresAt'    => session('reservation_expires_at'),
+        ]);
+    }
+
+    /**
+     * Seçilen koltukları doğrular ve session'a yazar.
+     *
+     * Doğrulama TicketService::quoteSeatFees() üzerinden yapılıyor — koltuk
+     * kabine ait mi, yolcu tipi oturabilir mi, ücreti ne kadar; hepsi satın
+     * alma anında çalışacak mantığın aynısıyla kontrol ediliyor.
+     */
+    public function storeSeats(Request $request)
+    {
+        $reservation = session('reservation');
+
+        if (! $reservation) {
+            return redirect('/')->withErrors([
+                'reservation' => 'Rezervasyon bilgileriniz bulunamadı. Lütfen yeniden arama yapın.',
+            ]);
+        }
+
+        $request->validate([
+            'seats'     => 'nullable|array',
+            'seats.*'   => 'nullable|array',
+            'seats.*.*' => 'nullable|string|max:5|regex:/^[0-9]{1,2}[A-K]$/',
+        ], [
+            'seats.*.*.regex' => 'Geçersiz koltuk numarası.',
+        ]);
+
+        $submitted = $request->input('seats', []);
+        $seats = [];
+
+        foreach (['outbound', 'inbound'] as $direction) {
+            $flightId = $reservation[$direction . '_flight'] ?? null;
+            if (! $flightId) {
+                continue;
+            }
+
+            $chosen = array_filter($submitted[$direction] ?? [], fn ($s) => filled($s));
+
+            if (empty($chosen)) {
+                continue; // koltuk seçilmeden devam edildi, otomatik atanacak
+            }
+
+            // Aynı bacakta iki yolcuya aynı koltuk verilemez
+            if (count($chosen) !== count(array_unique($chosen))) {
+                return back()->withErrors([
+                    'seats' => 'Aynı koltuk birden fazla yolcuya seçilemez.',
+                ]);
+            }
+
+            $flight = Flight::with(['aircraft', 'route'])->find($flightId);
+
+            try {
+                $this->ticketService->quoteSeatFees(
+                    $flight,
+                    $reservation[$direction . '_cabin'],
+                    $reservation['passengers'],
+                    $chosen
+                );
+            } catch (\InvalidArgumentException | \RuntimeException $e) {
+                return back()->withErrors(['seats' => $e->getMessage()]);
+            }
+
+            $seats[$direction] = $chosen;
+        }
+
+        $reservation['seats'] = $seats;
+        session(['reservation' => $reservation]);
 
         return redirect()->route('reservation.payment');
     }
@@ -225,17 +353,18 @@ class ReservationController extends Controller
             ]);
         }
 
-        [$legs, $grandTotal] = $this->rebuildLegs($reservation);
+        [$legs, $grandTotal, $seatFeeTotal] = $this->rebuildLegs($reservation);
 
         return view('flights.payment', [
-            'reservation' => $reservation,
-            'legs'        => $legs,
-            'grandTotal'  => $grandTotal,
-            'expiresAt'   => session('reservation_expires_at'),
+            'reservation'  => $reservation,
+            'legs'         => $legs,
+            'grandTotal'   => $grandTotal,
+            'seatFeeTotal' => $seatFeeTotal,
+            'expiresAt'    => session('reservation_expires_at'),
         ]);
     }
 
-    public function complete(Request $request, TicketService $ticketService, PaymentGatewayInterface $gateway)
+    public function complete(Request $request, PaymentGatewayInterface $gateway)
     {
         $request->validate([
             'card_holder' => 'required|string|max:100',
@@ -257,6 +386,7 @@ class ReservationController extends Controller
             ]);
         }
 
+        // Koltuk ücreti dahil toplam. İstemciden gelen hiçbir tutara güvenilmiyor.
         [, $grandTotal] = $this->rebuildLegs($reservation);
 
         $orderRef = 'DH' . now()->format('YmdHis') . random_int(100, 999);
@@ -275,12 +405,15 @@ class ReservationController extends Controller
         }
 
         try {
-            $result = $ticketService->purchaseReservation($reservation);
+            $result = $this->ticketService->purchaseReservation(
+                $reservation,
+                $reservation['seats'] ?? []
+            );
         } catch (\InvalidArgumentException | \RuntimeException $e) {
             // Para alındı ama bilet oluşturulamadı. Gerçek sağlayıcıda buraya iade
             // çağrısı gelir; sahte ağ geçidinde tahsilat zaten gerçekleşmediği için
             // yalnızca kayıt tutuyoruz.
-            \Log::critical('Ödeme alındı, bilet oluşturulamadı.', [
+            Log::critical('Ödeme alındı, bilet oluşturulamadı.', [
                 'transaction_id' => $payment->transactionId,
                 'order_ref'      => $orderRef,
                 'error'          => $e->getMessage(),
@@ -336,18 +469,21 @@ class ReservationController extends Controller
         }
 
         return view('flights.confirmation', [
-            'pnr'     => $pnr,
-            'tickets' => $tickets,
-            'total'   => $tickets->sum('final_price'),
+            'pnr'         => $pnr,
+            'tickets'     => $tickets,
+            // Ödenen tutar = bilet ücreti + koltuk ücreti
+            'total'       => $tickets->sum(fn ($t) => (float) $t->final_price + (float) $t->seat_fee),
+            'seatFeeTotal' => $tickets->sum(fn ($t) => (float) $t->seat_fee),
         ]);
     }
 
     /**
-     * Session'daki rezervasyondan uçuş ve fiyat bilgisini yeniden kurar.
-     * Fiyat session'dan okunmuyor, her seferinde yeniden hesaplanıyor —
-     * session'a müdahale edilmiş olsa bile ödeme tutarı doğru kalır.
+     * Session'daki rezervasyondan uçuş, fiyat ve koltuk ücreti bilgisini
+     * yeniden kurar. Fiyat session'dan okunmuyor, her seferinde yeniden
+     * hesaplanıyor — session'a müdahale edilmiş olsa bile ödeme tutarı doğru kalır.
+     * Koltuk ücreti de aynı sebeple burada, koltuk tipinden türetiliyor.
      *
-     * @return array{0: array, 1: int}
+     * @return array{0: array, 1: float, 2: float} [bacaklar, genel toplam, koltuk ücreti toplamı]
      */
     private function rebuildLegs(array $reservation): array
     {
@@ -359,6 +495,7 @@ class ReservationController extends Controller
 
         $legs = [];
         $grandTotal = 0;
+        $seatFeeTotal = 0;
 
         foreach (['outbound', 'inbound'] as $direction) {
             $flightId = $reservation[$direction . '_flight'] ?? null;
@@ -372,16 +509,37 @@ class ReservationController extends Controller
             $cabin = $reservation[$direction . '_cabin'];
             $fares = $this->searchService->getPricedFares($flight, $counts);
 
-            $grandTotal += $fares[$cabin]['total_price'];
+            $seats = $reservation['seats'][$direction] ?? [];
+            $legSeatFee = 0;
+
+            if (! empty($seats)) {
+                try {
+                    $legSeatFee = $this->ticketService->quoteSeatFees(
+                        $flight,
+                        $cabin,
+                        $reservation['passengers'],
+                        $seats
+                    );
+                } catch (\InvalidArgumentException | \RuntimeException) {
+                    // Koltuk arada geçersizleştiyse (kabin değişti, plan güncellendi)
+                    // ücret sıfırlanır; satın alma anında kullanıcıya net hata döner.
+                    $legSeatFee = 0;
+                }
+            }
+
+            $grandTotal   += $fares[$cabin]['total_price'] + $legSeatFee;
+            $seatFeeTotal += $legSeatFee;
 
             $legs[$direction] = [
-                'flight' => $flight,
-                'cabin'  => $cabin,
-                'fare'   => $fares[$cabin],
+                'flight'   => $flight,
+                'cabin'    => $cabin,
+                'fare'     => $fares[$cabin],
+                'seats'    => $seats,
+                'seat_fee' => $legSeatFee,
             ];
         }
 
-        return [$legs, $grandTotal];
+        return [$legs, $grandTotal, $seatFeeTotal];
     }
 
     /**
