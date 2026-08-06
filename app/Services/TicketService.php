@@ -17,14 +17,11 @@ class TicketService
     /** Kapasitenin %10 fazlasına kadar satışa izin verilir (overbooking). */
     private const OVERBOOKING_MULTIPLIER = 1.10;
 
-    /** Koltuk harfleri. Geniş gövdede 3-3-3 düzen; I ve F, 1 ile karışmasın diye kullanılmaz. */
-    private const SEAT_LETTERS_WIDE   = ['A', 'B', 'C', 'D', 'E', 'G', 'H', 'J', 'K'];
-    private const SEAT_LETTERS_NARROW = ['A', 'B', 'C', 'D', 'E', 'F'];
-
     public function __construct(
         private FlightService $flightService,
         private PricingService $pricingService,
         private ReminderService $reminderService,
+        private CabinLayoutService $cabinLayout,
     ) {}
 
     /**
@@ -35,9 +32,12 @@ class TicketService
      *   contact_email, contact_phone_e164,
      *   passengers[] => { type, first_name, last_name, id_type, id_no, birth_date (Y-m-d) }
      *
-     * $seatMap ile koltuklar dışarıdan verilebilir (koltuk seçimi adımı eklendiğinde):
+     * $seatMap ile koltuklar dışarıdan verilebilir (koltuk seçimi adımı):
      *   ['outbound' => [0 => '12A', 1 => '12B'], 'inbound' => [...]]
      * Verilmeyen koltuklar otomatik atanır.
+     *
+     * Koltuk ücreti burada, kilit altında YENİDEN hesaplanır — istemciden
+     * gelen tutara hiçbir koşulda güvenilmez.
      *
      * @return array{pnr: string, tickets: \App\Models\Ticket[]}
      */
@@ -86,12 +86,13 @@ class TicketService
                         'passenger_id'   => $passenger->id,
                         'cabin_class'    => $leg['cabin'],
                         'passenger_type' => $p['type'],
-                        'seat_number'    => $seats[$i] ?? null,
+                        'seat_number'    => $seats[$i]['seat'] ?? null,
                         'final_price'    => $this->pricingService->calculatePrice(
                             $leg['flight'],
                             $leg['cabin'],
                             $p['type']
                         ),
+                        'seat_fee'       => $seats[$i]['fee'] ?? 0,
                         'status'         => 'confirmed',
                     ]);
                 }
@@ -109,6 +110,46 @@ class TicketService
 
             return ['pnr' => $pnr, 'tickets' => $tickets];
         });
+    }
+
+    /**
+     * Seçilen koltukların toplam ücreti — satın alma yapılmadan, ödeme
+     * ekranının tutarı yeniden hesaplaması için.
+     *
+     * Koltuk geçersizse ya da yolcu tipi o koltuğa oturamıyorsa istisna atar;
+     * böylece ödeme sayfası hatalı seçimi kullanıcıya erkenden bildirir.
+     *
+     * @param array<int, string|null> $seats yolcu indeksi => koltuk
+     */
+    public function quoteSeatFees(Flight $flight, string $cabinClass, array $passengers, array $seats): float
+    {
+        $flight->loadMissing(['aircraft', 'route']);
+
+        $index         = $this->cabinLayout->seatIndex($flight->aircraft);
+        $rangeCategory = $flight->route->getRangeCategory();
+        $hasInfant     = $this->reservationHasInfant($passengers);
+
+        $total = 0.0;
+
+        foreach ($passengers as $i => $p) {
+            $seat = $seats[$i] ?? null;
+
+            if ($seat === null || ! $this->pricingService->occupiesSeat($p['type'])) {
+                continue;
+            }
+
+            $total += $this->resolveSeatFee(
+                $flight,
+                $cabinClass,
+                $seat,
+                $p['type'],
+                $index,
+                $rangeCategory,
+                $hasInfant
+            );
+        }
+
+        return $total;
     }
 
     /**
@@ -206,10 +247,11 @@ class TicketService
     }
 
     /**
-     * Yolcu sırasına göre koltuk listesi üretir. Bebeklere koltuk verilmez (null).
-     * Dışarıdan gelen koltuklar doluysa reddedilir.
+     * Yolcu sırasına göre koltuk ve ücret listesi üretir.
+     * Bebeklere koltuk verilmez (null). Dışarıdan gelen koltuklar doluysa,
+     * kabin dışındaysa ya da yolcu tipine kapalıysa reddedilir.
      *
-     * @return array<int, string|null> yolcu indeksi => koltuk
+     * @return array<int, array{seat: string|null, type: string|null, fee: float}>
      */
     private function allocateSeats(Flight $flight, string $cabinClass, array $passengers, array $preferred): array
     {
@@ -219,12 +261,20 @@ class TicketService
             ->pluck('seat_number')
             ->all();
 
-        $available = array_values(array_diff($this->cabinSeats($flight->aircraft, $cabinClass), $taken));
+        $available = array_values(array_diff(
+            $this->cabinSeats($flight->aircraft, $cabinClass),
+            $taken
+        ));
+
+        $index         = $this->cabinLayout->seatIndex($flight->aircraft);
+        $rangeCategory = $flight->route->getRangeCategory();
+        $hasInfant     = $this->reservationHasInfant($passengers);
+
         $result = [];
 
         foreach ($passengers as $i => $p) {
             if (! $this->pricingService->occupiesSeat($p['type'])) {
-                $result[$i] = null;
+                $result[$i] = ['seat' => null, 'type' => null, 'fee' => 0.0];
                 continue;
             }
 
@@ -234,14 +284,34 @@ class TicketService
                 if (! in_array($choice, $available, true)) {
                     throw new \RuntimeException("{$choice} koltuğu bu uçuşta seçilemez.");
                 }
+
+                $fee = $this->resolveSeatFee(
+                    $flight,
+                    $cabinClass,
+                    $choice,
+                    $p['type'],
+                    $index,
+                    $rangeCategory,
+                    $hasInfant
+                );
             } else {
-                if (empty($available)) {
+                // Otomatik atama ücretli koltuk vermez: kullanıcının seçmediği
+                // bir koltuk için ücret tahsil etmek doğru olmaz.
+                $choice = $this->firstFreeSeat($available, $cabinClass, $p['type'], $index, $rangeCategory, $hasInfant);
+
+                if ($choice === null) {
                     throw new \RuntimeException("Bu kabinde boş koltuk kalmadı: {$flight->flight_number}");
                 }
-                $choice = $available[0];
+
+                $fee = 0.0;
             }
 
-            $result[$i] = $choice;
+            $result[$i] = [
+                'seat' => $choice,
+                'type' => $index[$choice]['type'] ?? null,
+                'fee'  => $fee,
+            ];
+
             $available = array_values(array_diff($available, [$choice]));
         }
 
@@ -249,40 +319,99 @@ class TicketService
     }
 
     /**
+     * Seçilen koltuğun ücreti. Koltuk kabine ait değilse ya da yolcu tipi
+     * o koltuğa oturamıyorsa istisna atar.
+     */
+    private function resolveSeatFee(
+        Flight $flight,
+        string $cabinClass,
+        string $seat,
+        string $passengerType,
+        array $index,
+        string $rangeCategory,
+        bool $hasInfant
+    ): float {
+        if (! isset($index[$seat])) {
+            throw new \RuntimeException("{$seat} koltuğu {$flight->aircraft->model} kabin planında bulunmuyor.");
+        }
+
+        if ($index[$seat]['cabin_class'] !== $cabinClass) {
+            throw new \RuntimeException("{$seat} koltuğu seçilen kabin sınıfına ait değil.");
+        }
+
+        $seatType = $index[$seat]['type'];
+
+        if (! $this->cabinLayout->canOccupy($seatType, $passengerType, $hasInfant)) {
+            throw new \RuntimeException($this->cabinLayout->occupancyError($seat, $seatType));
+        }
+
+        return $this->cabinLayout->fee($cabinClass, $seatType, $rangeCategory);
+    }
+
+    /**
+     * Otomatik atama için ilk uygun ÜCRETSİZ koltuk.
+     * Ücretli koltuklar (ön sıra, ekstra diz mesafeli, acil çıkış) ve
+     * yolcu tipine kapalı koltuklar atlanır.
+     */
+    private function firstFreeSeat(
+        array $available,
+        string $cabinClass,
+        string $passengerType,
+        array $index,
+        string $rangeCategory,
+        bool $hasInfant
+    ): ?string {
+        foreach ($available as $seat) {
+            $seatType = $index[$seat]['type'] ?? null;
+
+            if (! $this->cabinLayout->canOccupy($seatType, $passengerType, $hasInfant)) {
+                continue;
+            }
+
+            if ($this->cabinLayout->fee($cabinClass, $seatType, $rangeCategory) > 0) {
+                continue;
+            }
+
+            return $seat;
+        }
+
+        // Kabinde ücretsiz koltuk kalmadıysa, uygun olan ilk koltuk ücretsiz verilir.
+        foreach ($available as $seat) {
+            $seatType = $index[$seat]['type'] ?? null;
+
+            if ($this->cabinLayout->canOccupy($seatType, $passengerType, $hasInfant)) {
+                return $seat;
+            }
+        }
+
+        return null;
+    }
+
+    /** Rezervasyonda bebek var mı — bebek pusetli koltuk kuralı için. */
+    private function reservationHasInfant(array $passengers): bool
+    {
+        foreach ($passengers as $p) {
+            if (($p['type'] ?? null) === 'infant') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Kabin sınıfına ait tüm koltuk numaraları (business önde, economy arkada).
-     * Sıra sayısı gövde tipine göre değişir — eskiden her uçakta 6 koltuk varsayılıyordu,
-     * bu yüzden geniş gövdeli uçaklarda koltukların çoğu hiç atanamıyordu.
+     *
+     * Koltuk düzeni artık CabinLayoutService'ten geliyor. Bu metot eskiden
+     * her uçakta sabit harf seti ve tek bir sıra genişliği varsayıyordu;
+     * B777'nin 1-2-1 business kabini ile 3-4-3 economy kabini aynı hesapla
+     * üretildiği için PROJECT_CONTEXT Bölüm 2'deki kabin planıyla uyuşmuyordu.
      *
      * @return string[]
      */
     private function cabinSeats(\App\Models\Aircraft $aircraft, string $cabinClass): array
     {
-        $letters = $aircraft->body_type === 'wide'
-            ? self::SEAT_LETTERS_WIDE
-            : self::SEAT_LETTERS_NARROW;
-
-        $perRow = count($letters);
-
-        $businessRows = (int) ceil($aircraft->business_seats / $perRow);
-        $premiumRows  = (int) ceil($aircraft->premium_economy_seats / $perRow);
-        $totalRows    = (int) ceil($aircraft->total_capacity / $perRow);
-
-        [$rowStart, $rowEnd] = match ($cabinClass) {
-            'business'        => [1, $businessRows],
-            'premium_economy' => [$businessRows + 1, $businessRows + $premiumRows],
-            'economy'         => [$businessRows + $premiumRows + 1, $totalRows],
-            default           => throw new \InvalidArgumentException("Bilinmeyen kabin sınıfı: {$cabinClass}"),
-        };
-
-        $seats = [];
-
-        for ($row = $rowStart; $row <= $rowEnd; $row++) {
-            foreach ($letters as $letter) {
-                $seats[] = $row . $letter;
-            }
-        }
-
-        return $seats;
+        return $this->cabinLayout->seatNumbers($aircraft, $cabinClass);
     }
 
     private function generatePnr(): string
